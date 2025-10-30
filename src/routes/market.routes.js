@@ -2,11 +2,12 @@ import { Router } from "express";
 import { admin, auth } from "../middlewares/auth.middleware.js";
 import { createMarket, deleteMarket, getAllMarkets, updateMarket } from "../controllers/market.controller.js";
 
-const marketRoutes = Router()
+const router = Router();
 
-marketRoutes.use(auth);
+// Rutas de markets
+router.get("/markets", auth, getAllMarkets);
+router.post("/markets", auth, admin, createMarket);
+router.put("/markets/:id", auth, admin, updateMarket);
+router.delete("/markets/:id", auth, admin, deleteMarket);
 
-marketRoutes.get("/markets", getAllMarkets);
-marketRoutes.post("/markets", admin, createMarket);
-marketRoutes.put("/markets/id", admin, updateMarket);
-marketRoutes.delete("/markets/id", admin, deleteMarket);
+export default router;

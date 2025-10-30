@@ -2,23 +2,42 @@ import api from './api.js';
 
 export const authService = {
   register: async (userData) => {
-    const response = await api.post('/register', userData);
-    return response.data;
+    try {
+      const response = await api.post('/register', userData);
+      return response.data;
+    } catch (error) {
+      console.error('Register error:', error.response?.data || error.message);
+      throw error;
+    }
   },
 
   login: async (credentials) => {
-    const response = await api.post('/login', credentials);
-    return response.data;
+    try {
+      const response = await api.post('/login', credentials);
+      return response.data;
+    } catch (error) {
+      console.error('Login error:', error.response?.data || error.message);
+      throw error;
+    }
   },
 
   logout: async () => {
-    const response = await api.post('/logout');
-    return response.data;
+    try {
+      const response = await api.post('/logout');
+      return response.data;
+    } catch (error) {
+      console.error('Logout error:', error.response?.data || error.message);
+      throw error;
+    }
   },
 
-  // Obtiene el perfil real del usuario autenticado
   getProfile: async () => {
-    const response = await api.get('/profile');
-    return response.data;
+    try {
+      const response = await api.get('/profile');
+      return response.data;
+    } catch (error) {
+      console.error('Get profile error:', error.response?.data || error.message);
+      throw error;
+    }
   }
 };

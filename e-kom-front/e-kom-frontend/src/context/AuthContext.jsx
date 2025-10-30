@@ -11,11 +11,20 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const loadUser = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+      
       try {
         const profileData = await authService.getProfile();
         setUser(profileData); 
       } catch (error) {
+        console.error('Error loading user profile:', error);
         setUser(null);
+        localStorage.removeItem('token'); // Limpiamos el token si hay error
       } finally {
         setLoading(false);
       }
@@ -25,7 +34,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      await authService.login(credentials);
+      const response = await authService.login(credentials);
+      // Guardamos el token en localStorage
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+      }
       const profileData = await authService.getProfile();
       setUser(profileData);
       return { success: true, message: "Inicio de sesión exitoso" };
@@ -38,6 +51,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     await authService.logout();
+    localStorage.removeItem('token');
     setUser(null);
   };
 

@@ -10,22 +10,16 @@ import { registerValidations } from "../middlewares/validations/auth.validations
 
 const router = Router();
 
-router.get("/user", getAllUsers);
-router.get("/user/:id", getUserById);
-router.post("/user/", auth, admin, createUserValidation, handleValidation, createUser);
-router.put("/user/:id", auth, updateUserValidation, handleValidation, updateUser);
-//register,login y logout
+// Rutas públicas de autenticación
 router.post("/register", registerValidations, handleValidation, register);
 router.post("/login", login);
-router.post("/logout", logout);
-//Solo el admin debe poder eliminar y ver todos los usuarios
-router.delete("/user/:id", auth, admin, deleteUser);
+router.post("/logout", auth, logout);  // El logout sí necesita autenticación
 
-// Rutas protegidas
+// Rutas protegidas que requieren autenticación
 router.get("/user", auth, getAllUsers);
 router.get("/user/:id", auth, getUserById);
-router.post("/user/", createUserValidation, handleValidation, createUser);
-router.put("/user/:id", auth, createUserValidation, handleValidation, updateUser);
+router.post("/user", auth, admin, createUserValidation, handleValidation, createUser);
+router.put("/user/:id", auth, updateUserValidation, handleValidation, updateUser);
 router.delete("/user/:id", auth, admin, deleteUser);
 
 export default router;
