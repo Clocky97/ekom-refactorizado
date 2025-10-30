@@ -17,6 +17,18 @@ export const PostModel = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: false
         },
+        "market_id": {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        "product_id": {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        "offer_id": {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
         brand: {
             type: DataTypes.STRING,
             allowNull: false

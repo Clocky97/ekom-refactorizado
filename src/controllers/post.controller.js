@@ -21,24 +21,39 @@ export const getPostById = async (req, res) => {
 };
 
 export const createPost = async (req, res) => {
-    const {title, content, offer, product, market, price} = req.body;
     try {
+        const { title, content, price, brand, market_id, product_id, offer_id } = req.body;
+        
+        // Validar datos requeridos
+        if (!title || !content || !price || !market_id || !product_id) {
+            return res.status(400).json({ 
+                message: "Faltan campos requeridos",
+                required: ["title", "content", "price", "market_id", "product_id"]
+            });
+        }
+
         const createPost = await PostModel.create({
-            title: title,
-            content: content,
-            offer: offer,
-            product: product,
-            market: market,
-            price: price,
+            title,
+            content,
+            price,
+            brand,
+            market_id,
+            product_id,
+            offer_id: offer_id || null,
             user_id: req.user.id
         });
+
         res.status(201).json({
-            message: "Publicación creada correctamente"
+            message: "Publicación creada correctamente",
+            post: createPost
         });
         
     } catch (error) {
-        res.status(500).json({ message: "Error interno del servidor"});
-        console.log(error)
+        console.error("Error al crear post:", error);
+        res.status(500).json({ 
+            message: "Error al crear la publicación",
+            error: error.message
+        });
     }
 };
 

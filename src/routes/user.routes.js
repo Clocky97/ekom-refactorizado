@@ -13,7 +13,7 @@ const router = Router();
 // Rutas públicas de autenticación
 router.post("/register", registerValidations, handleValidation, register);
 router.post("/login", login);
-router.post("/logout", auth, logout);  // El logout sí necesita autenticación
+router.post("/logout", logout);  // El logout sí necesita autenticación
 
 // Rutas protegidas que requieren autenticación
 router.get("/user", auth, getAllUsers);
