@@ -4,7 +4,10 @@ const API_BASE_URL = 'http://127.0.0.1:1212/ekom';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, 
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
 // Interceptor para añadir el token a todas las peticiones
@@ -12,8 +15,12 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  } else {
+    console.warn('No se encontró token de autenticación');
   }
   return config;
+}, (error) => {
+  return Promise.reject(error);
 });
 
 export default api;

@@ -9,6 +9,8 @@ import categoryRouter from "./src/routes/category.routes.js";
 import postRouter from "./src/routes/post.routes.js";
 import ProductRouter from "./src/routes/product.routes.js";
 import marketRouter from "./src/routes/market.routes.js";
+import ratingRouter from "./src/routes/rating.routes.js";
+import reportRouter from "./src/routes/report.routes.js";
 import cookieParser from "cookie-parser";
 import { offerRoutes } from "./src/routes/offer.routes.js";
 
@@ -35,6 +37,8 @@ app.use("/ekom", postRouter);
 app.use("/ekom", ProductRouter);
 app.use("/ekom", offerRoutes);
 app.use("/ekom", marketRouter);
+app.use("/ekom", ratingRouter);
+app.use("/ekom", reportRouter);
 
 app.listen(PORT, async () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);

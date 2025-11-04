@@ -2,6 +2,8 @@ import Rating from "../models/rating.model.js";
 import {PostModel} from "../models/post.model.js";
 
 export const ratePost = async (req, res) => {
+  // Debug incoming headers
+  console.log('ratePost - Authorization header:', req.headers.authorization);
   const { postId, score } = req.body;
   const userId = req.user.id;
   // Evita puntuaciones duplicadas

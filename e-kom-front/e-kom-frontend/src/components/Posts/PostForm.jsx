@@ -93,6 +93,7 @@ const PostForm = ({ postToEdit, onClose, onSave }) => {
       onClose(); 
     } catch (err) {
       console.error("Error al guardar post:", err.response?.data);
+      console.log(err)
       setError(err.response?.data?.message || 'Error al guardar la publicación.');
     }
   };

@@ -22,6 +22,9 @@ export const getPostById = async (req, res) => {
 
 export const createPost = async (req, res) => {
     try {
+        // Debug: show incoming authorization header to troubleshoot "Token requerido"
+        console.log('createPost - Authorization header:', req.headers.authorization);
+
         const { title, content, price, brand, market_id, product_id, offer_id } = req.body;
         
         // Validar datos requeridos

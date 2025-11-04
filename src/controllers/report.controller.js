@@ -1,6 +1,7 @@
 import Report from "../models/report.model.js";
 
 export const createReport = async (req, res) => {
+  console.log('createReport - Authorization header:', req.headers.authorization);
   const { postId, reason } = req.body;
   const userId = req.user.id;
   // Evita reportes duplicados

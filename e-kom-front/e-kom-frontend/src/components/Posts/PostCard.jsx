@@ -23,12 +23,16 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
   const handleRate = async (score) => {
     if (!isAuthenticated) return alert("Debes iniciar sesión para calificar.");
     try {
+      // Debug: show token presence
+      console.log('handleRate - localStorage token:', localStorage.getItem('token'));
+      console.log('handleRate - axios Authorization header:', (await import('../../api/api')).default.defaults.headers.common.Authorization);
       await postsService.ratePost(post.id, score);
       const newAvg = await postsService.getAverageRating(post.id);
       setAverageRating(newAvg);
       alert(`Has calificado el post con ${score} estrellas.`);
     } catch (error) {
-      alert("Error al calificar.");
+      console.error('Error al calificar:', error);
+      alert(error.response?.data?.message || 'Error al calificar.');
     }
   };
 
@@ -38,9 +42,13 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
     if (!reason) return;
 
     try {
+      // Debug: show token presence
+      console.log('handleReport - localStorage token:', localStorage.getItem('token'));
+      console.log('handleReport - axios Authorization header:', (await import('../../api/api')).default.defaults.headers.common.Authorization);
       await postsService.createReport(post.id, reason);
       alert("Publicación reportada correctamente.");
     } catch (error) {
+      console.error('Error al reportar:', error);
       alert(error.response?.data?.error || "Error al reportar el post.");
     }
   };
@@ -67,8 +75,15 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
       
       {isAuthenticated && !isOwner && (
         <div>
-          <button onClick={() => handleRate(5)}>Calificar 5⭐</button>
-          <button onClick={handleReport} style={{ marginLeft: '10px', backgroundColor: 'red', color: 'white' }}>
+          <div style={{ marginBottom: '8px' }}>
+            <span>Calificar: </span>
+            {[1,2,3,4,5].map(n => (
+              <button key={n} onClick={() => handleRate(n)} style={{ marginLeft: 6 }}>
+                {n}⭐
+              </button>
+            ))}
+          </div>
+          <button onClick={handleReport} style={{ backgroundColor: 'red', color: 'white' }}>
             Reportar
           </button>
         </div>

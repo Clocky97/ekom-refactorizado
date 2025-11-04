@@ -27,12 +27,14 @@ export const postsService = {
   },
 
   ratePost: async (postId, score) => {
-    const response = await api.post('/rating/rate', { postId, score });
+    // Backend expects POST /rating with body { postId, score }
+    const response = await api.post('/rating', { postId, score });
     return response.data;
   },
 
   getAverageRating: async (postId) => {
-    const response = await api.get(`/rating/post/${postId}/average`);
+    // Backend exposes GET /rating/:postId which returns { average }
+    const response = await api.get(`/rating/${postId}`);
     return response.data.average;
   },
 
