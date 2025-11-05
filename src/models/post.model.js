@@ -36,6 +36,10 @@ export const PostModel = sequelize.define(
         price: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+        image: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     }
 )

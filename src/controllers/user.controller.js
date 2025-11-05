@@ -73,3 +73,17 @@ export const deleteUser = async (req, res) => {
         res.status(500).json({ error: "Error al eliminar: " + error.message });
     }
 };
+
+// Obtener el usuario actualmente autenticado (con perfil)
+export const getCurrentUser = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await User.findByPk(userId, {
+            include: [{ model: Profile, as: 'profile' }]
+        });
+        if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener usuario actual: ' + error.message });
+    }
+};

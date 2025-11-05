@@ -15,6 +15,8 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+    // Log breve para depuración: no imprimir token completo en producción
+    console.debug('Authorization header set');
   } else {
     console.warn('No se encontró token de autenticación');
   }

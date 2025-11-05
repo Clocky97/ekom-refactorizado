@@ -3,6 +3,8 @@ import { postsService } from '../api/posts.service';
 import PostCard from '../components/Posts/PostCard';
 import PostForm from '../components/Posts/PostForm';
 import { useAuth } from '../context/AuthContext';
+import ConfirmModal from '../components/Common/ConfirmModal';
+import { useToast } from '../context/ToastContext.jsx';
 
 const PostsPage = () => {
   const { isAuthenticated } = useAuth();
@@ -39,15 +41,29 @@ const PostsPage = () => {
   };
 
   const handleDelete = async (postId) => {
-    if (!window.confirm("¿Estás seguro de que quieres eliminar esta publicación?")) return;
+    // open confirm modal
+    setDeleteCandidate(postId);
+  };
+
+  const [deleteCandidate, setDeleteCandidate] = useState(null);
+
+  const toast = useToast();
+
+  const confirmDelete = async () => {
+    const postId = deleteCandidate;
+    setDeleteCandidate(null);
     try {
       await postsService.deletePost(postId);
-      alert('Publicación eliminada.');
-      fetchPosts(); 
+      toast.push('Publicación eliminada correctamente', { type: 'success' });
+      // small delay so user sees toast
+      setTimeout(() => fetchPosts(), 400);
     } catch (error) {
-      alert(error.response?.data?.msj || "Error al eliminar la publicación.");
+      const msg = error?.response?.data?.message || 'Error al eliminar la publicación.';
+      toast.push(msg, { type: 'error' });
     }
   };
+
+  const cancelDelete = () => setDeleteCandidate(null);
 
   if (loading) {
     return <div>Cargando publicaciones...</div>;
@@ -70,6 +86,16 @@ const PostsPage = () => {
           onSave={fetchPosts}
         />
       )}
+
+      <ConfirmModal
+        open={!!deleteCandidate}
+        title="Eliminar publicación"
+        message="¿Estás seguro de que quieres eliminar esta publicación? Esta acción no se puede deshacer."
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+      />
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
         {posts.length > 0 ? (

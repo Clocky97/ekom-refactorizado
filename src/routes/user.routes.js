@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { register, login, logout } from "../controllers/auth.controller.js";
-import { getAllUsers, getUserById, createUser, updateUser, deleteUser } from "../controllers/user.controller.js";
+import { getAllUsers, getUserById, createUser, updateUser, deleteUser, getCurrentUser } from "../controllers/user.controller.js";
 import { createUserValidation } from "../middlewares/validations/user.validation.js";
 import { handleValidation } from "../middlewares/validation_handler.js";
 import { auth, admin } from "../middlewares/auth.middleware.js";
@@ -17,6 +17,7 @@ router.post("/logout", logout);  // El logout sí necesita autenticación
 
 // Rutas protegidas que requieren autenticación
 router.get("/user", auth, getAllUsers);
+router.get("/me", auth, getCurrentUser);
 router.get("/user/:id", auth, getUserById);
 router.post("/user", auth, admin, createUserValidation, handleValidation, createUser);
 router.put("/user/:id", auth, updateUserValidation, handleValidation, updateUser);

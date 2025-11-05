@@ -66,35 +66,68 @@ const PostForm = ({ postToEdit, onClose, onSave }) => {
     }));
   };
 
+  const [submitting, setSubmitting] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    setImageFile(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
-    const payload = {
-        ...formData,
-        price: Number(formData.price),
-        market_id: Number(formData.market_id),
-        product_id: Number(formData.product_id),
-    };
-    
-    if (!payload.offer_id) {
-        delete payload.offer_id;
-    }
+    setSubmitting(true);
+
+    const selectedMarket = markets.find(m => String(m.id) === String(formData.market_id));
 
     try {
+      let resp;
       if (postToEdit) {
-        await postsService.updatePost(postToEdit.id, payload);
+        const payload = {
+          ...formData,
+          price: Number(formData.price),
+          market_id: Number(formData.market_id),
+          product_id: Number(formData.product_id),
+          market_name: selectedMarket ? selectedMarket.name : undefined,
+        };
+        if (!payload.offer_id) delete payload.offer_id;
+        resp = await postsService.updatePost(postToEdit.id, payload);
+        console.log('updatePost response:', resp);
         alert('Publicación actualizada con éxito.');
       } else {
-        await postsService.createPost(payload);
+        // Creation requires an image file
+        if (!imageFile) {
+          setError('La publicación requiere una imagen del producto.');
+          setSubmitting(false);
+          return;
+        }
+
+        const formDataToSend = new FormData();
+        formDataToSend.append('title', formData.title);
+        formDataToSend.append('content', formData.content);
+        formDataToSend.append('price', Number(formData.price));
+        formDataToSend.append('brand', formData.brand);
+        formDataToSend.append('market_id', Number(formData.market_id));
+        formDataToSend.append('product_id', Number(formData.product_id));
+        if (formData.offer_id) formDataToSend.append('offer_id', formData.offer_id);
+        formDataToSend.append('image', imageFile);
+
+        resp = await postsService.createPost(formDataToSend);
+        console.log('createPost response:', resp);
         alert('Publicación creada con éxito.');
       }
-      onSave(); 
-      onClose(); 
+
+      setFormData(initialFormState);
+      setImageFile(null);
+      try { onSave(); } catch (err) { console.warn('onSave callback threw:', err); }
+      try { onClose(); } catch (err) { console.warn('onClose callback threw:', err); }
     } catch (err) {
-      console.error("Error al guardar post:", err.response?.data);
-      console.log(err)
-      setError(err.response?.data?.message || 'Error al guardar la publicación.');
+      console.error('Error al guardar post:', err);
+      const serverMsg = err?.response?.data?.message || err?.response?.data || err.message;
+      setError(serverMsg || 'Error al guardar la publicación.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -133,8 +166,11 @@ const PostForm = ({ postToEdit, onClose, onSave }) => {
             <option value="">Ninguna</option>
         </select><br /> */}
 
-        <button type="submit">
-          {postToEdit ? 'Guardar Cambios' : 'Publicar'}
+        <label style={{ display: 'block', marginTop: 8 }}>Imagen del producto (requerida)</label>
+        <input type="file" accept="image/*" onChange={handleFileChange} required={!postToEdit} /><br />
+
+        <button type="submit" disabled={submitting}>
+          {submitting ? 'Guardando...' : (postToEdit ? 'Guardar Cambios' : 'Publicar')}
         </button>
         <button type="button" onClick={onClose} style={{ marginLeft: '10px' }}>Cancelar</button>
       </form>

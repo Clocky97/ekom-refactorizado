@@ -1,4 +1,4 @@
-import api from './api';
+import api from './api.js';
 
 export const postsService = {
   getAllPosts: async () => {
@@ -12,6 +12,11 @@ export const postsService = {
   },
 
   createPost: async (postData) => {
+    // If postData is a FormData (contains file), send as multipart/form-data
+    if (postData instanceof FormData) {
+      const response = await api.post('/post', postData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      return response.data;
+    }
     const response = await api.post('/post', postData);
     return response.data;
   },

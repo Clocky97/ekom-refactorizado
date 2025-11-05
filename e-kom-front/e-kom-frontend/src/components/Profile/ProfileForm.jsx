@@ -7,6 +7,7 @@ const ProfileForm = ({ profileData, onSave, onCancel }) => {
     lastname: '',
     bio: '',
     avatar: '',
+    avatarFile: null,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -30,6 +31,11 @@ const ProfileForm = ({ profileData, onSave, onCancel }) => {
     }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    setFormData(prev => ({ ...prev, avatarFile: file }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -37,8 +43,24 @@ const ProfileForm = ({ profileData, onSave, onCancel }) => {
 
     try {
       const profileId = profileData.id; 
-      
-      await profileService.updateProfile(profileId, formData);
+      // If the user selected a file, send multipart/form-data
+      if (formData.avatarFile) {
+        const fd = new FormData();
+        fd.append('name', formData.name);
+        fd.append('lastname', formData.lastname);
+        fd.append('bio', formData.bio || '');
+        // append the file under field name 'avatar' (backend expects this)
+        fd.append('avatar', formData.avatarFile);
+        await profileService.updateProfile(profileId, fd);
+      } else {
+        // send JSON with optional avatar URL
+        await profileService.updateProfile(profileId, {
+          name: formData.name,
+          lastname: formData.lastname,
+          bio: formData.bio,
+          avatar: formData.avatar || ''
+        });
+      }
       alert('Perfil actualizado con éxito.');
       onSave();
     } catch (err) {
@@ -60,7 +82,9 @@ const ProfileForm = ({ profileData, onSave, onCancel }) => {
         <input type="text" name="name" placeholder="Nombre" value={formData.name} onChange={handleChange} required /><br />
         <input type="text" name="lastname" placeholder="Apellido" value={formData.lastname} onChange={handleChange} required /><br />
         <textarea name="bio" placeholder="Biografía" value={formData.bio} onChange={handleChange}></textarea><br />
-        <input type="url" name="avatar" placeholder="URL del Avatar" value={formData.avatar} onChange={handleChange} /><br />
+  <input type="url" name="avatar" placeholder="URL del Avatar" value={formData.avatar} onChange={handleChange} /><br />
+  <label style={{ display: 'block', marginTop: 8 }}>Subir foto de perfil</label>
+  <input type="file" name="avatarFile" accept="image/*" onChange={handleFileChange} /><br />
         
         <button type="submit" disabled={loading}>
           {loading ? 'Guardando...' : 'Guardar'}

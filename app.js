@@ -30,6 +30,9 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Serve uploaded files
+app.use('/uploads', express.static('uploads'));
+
 app.use("/ekom", userRouter);
 app.use("/ekom", profileRouter);
 app.use("/ekom", categoryRouter);

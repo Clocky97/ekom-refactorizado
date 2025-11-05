@@ -41,6 +41,18 @@ const HomePage = () => {
     }
   };
 
+  const handleDelete = async (postId) => {
+    if (window.confirm("¿Estás seguro de que quieres eliminar esta publicación?")) {
+      try {
+        await postsService.deletePost(postId);
+        loadPosts(); // Refresh posts after deletion
+      } catch (error) {
+        console.error('Error al eliminar:', error);
+        alert(error.response?.data?.message || "Error al eliminar la publicación");
+      }
+    }
+  };
+
   const handlePostCreated = () => {
     loadPosts();
     setShowPostForm(false);
@@ -48,16 +60,21 @@ const HomePage = () => {
 
   return (
     <div className="container">
-      <div className="home-header">
-        <h1>E-KOM</h1>
-        <p className="subtitle">Encuentra y comparte las mejores ofertas</p>
-      </div>
+      {/* Sidebar */}
+      <div className="sidebar">
+        <div className="home-header">
+          <h1>E-KOM</h1>
+          <p className="subtitle">Encuentra y comparte las mejores ofertas</p>
+        </div>
 
-      <div className="controls-section">
         <div className="category-filter">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Categorías
+          </label>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
+            className="w-full"
           >
             <option value="">Todas las categorías</option>
             {categories.map(cat => (
@@ -66,45 +83,46 @@ const HomePage = () => {
           </select>
         </div>
 
-        {isAuthenticated && (
-          <button 
-            className="btn-primary"
-            onClick={() => setShowPostForm(!showPostForm)}
-          >
-            {showPostForm ? 'Cancelar' : 'Nueva Publicación'}
-          </button>
+        {/* El botón 'Nueva Publicación' se removió del sidebar por petición del usuario */}
+
+        {!isAuthenticated && (
+          <div className="auth-prompt mt-4">
+            <p className="text-sm text-gray-600">¿Quieres compartir una oferta? Inicia sesión o regístrate</p>
+          </div>
         )}
       </div>
 
-      {showPostForm && (
-        <PostForm onPostCreated={handlePostCreated} />
-      )}
+      {/* Main Content */}
+      <div className="main-content">
+        {showPostForm && (
+          <div className="post-form-container">
+            <PostForm onPostCreated={handlePostCreated} />
+          </div>
+        )}
 
-      {loading ? (
-        <div className="loading">Cargando publicaciones...</div>
-      ) : (
-        <div className="posts-grid">
-          {posts.length > 0 ? (
-            posts.map(post => (
-              <PostCard 
-                key={post.id} 
-                post={post}
-                onUpdate={loadPosts}
-              />
-            ))
-          ) : (
-            <div className="no-posts">
-              <p>No hay publicaciones disponibles{selectedCategory && ' en esta categoría'}.</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {!isAuthenticated && (
-        <div className="auth-prompt">
-          <p>¿Quieres compartir una oferta? Inicia sesión o regístrate</p>
-        </div>
-      )}
+        {loading ? (
+          <div className="loading flex justify-center items-center min-h-[200px]">
+            Cargando publicaciones...
+          </div>
+        ) : (
+          <div className="posts-container">
+            {posts.length > 0 ? (
+              posts.map(post => (
+                <PostCard 
+                  key={post.id} 
+                  post={post}
+                  onUpdate={loadPosts}
+                  onDelete={handleDelete}
+                />
+              ))
+            ) : (
+              <div className="no-posts">
+                <p>No hay publicaciones disponibles{selectedCategory && ' en esta categoría'}.</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
