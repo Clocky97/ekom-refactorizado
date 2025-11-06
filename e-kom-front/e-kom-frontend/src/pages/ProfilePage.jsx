@@ -86,8 +86,8 @@ const ProfilePage = () => {
       <div style={{ background: '#ffffff', borderRadius: 12, padding: 20, border: '1px solid #eef2ff', boxShadow: '0 6px 18px rgba(2,6,23,0.03)' }}>
         <div style={{ display: 'flex', gap: 28 }}>
           <div style={{ flex: 1 }}>
-            <p style={{ margin: '6px 0' }}><strong>Correo:</strong> {profile.user?.email}</p>
-            <p style={{ margin: '6px 0' }}><strong>Rol:</strong> {profile.user?.role}</p>
+            <p style={{ margin: '6px 0' }}><strong></strong> {profile.user?.email}</p>
+            <p style={{ margin: '6px 0' }}><strong></strong> {profile.user?.role}</p>
             <p style={{ margin: '6px 0' }}><strong>Fecha de registro:</strong> {profile.user?.createdAt ? new Date(profile.user.createdAt).toLocaleDateString() : '—'}</p>
           </div>
           <div style={{ width: 160, textAlign: 'center' }}>

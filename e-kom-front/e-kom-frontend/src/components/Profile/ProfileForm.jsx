@@ -42,30 +42,29 @@ const ProfileForm = ({ profileData, onSave, onCancel }) => {
     setError('');
 
     try {
-      const profileId = profileData.id; 
-      // If the user selected a file, send multipart/form-data
-      if (formData.avatarFile) {
-        const fd = new FormData();
-        fd.append('name', formData.name);
-        fd.append('lastname', formData.lastname);
-        fd.append('bio', formData.bio || '');
-        // append the file under field name 'avatar' (backend expects this)
-        fd.append('avatar', formData.avatarFile);
-        await profileService.updateProfile(profileId, fd);
-      } else {
-        // send JSON with optional avatar URL
-        await profileService.updateProfile(profileId, {
-          name: formData.name,
-          lastname: formData.lastname,
-          bio: formData.bio,
-          avatar: formData.avatar || ''
-        });
+      const profileId = profileData.id;
+      if (!profileId) {
+        throw new Error('ID de perfil no encontrado');
       }
+
+      // First, update the profile data
+      await profileService.updateProfile(profileId, {
+        name: formData.name.trim(),
+        lastname: formData.lastname.trim(),
+        bio: formData.bio ? formData.bio.trim() : '',
+        avatar: formData.avatar || ''
+      });
+
+      // If there's a new avatar file, update it separately
+      if (formData.avatarFile) {
+        await profileService.updateProfileAvatar(profileId, formData.avatarFile);
+      }
+
       alert('Perfil actualizado con éxito.');
       onSave();
     } catch (err) {
-      console.error("Error al actualizar perfil:", err.response?.data);
-      const errorMsg = err.response?.data?.error || 'Error al actualizar el perfil.';
+      console.error("Error al actualizar perfil:", err.response?.data || err.message);
+      const errorMsg = err.response?.data?.error || err.message || 'Error al actualizar el perfil.';
       setError(errorMsg);
     } finally {
       setLoading(false);

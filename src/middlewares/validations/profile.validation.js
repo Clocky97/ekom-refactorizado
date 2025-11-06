@@ -9,10 +9,9 @@ export const createProfileValidation = [
     .isLength({ min: 2, max: 100 }).withMessage("El apellido debe tener entre 2 y 100 caracteres"),
   body("bio")
     .optional()
-    .isLength({ max: 500 }).withMessage("La bio no puede superar los 500 caracteres"),
+    .isLength({ max: 1000 }).withMessage("La bio no puede superar los 1000 caracteres"),
   body("avatar")
-    .optional()
-    .isURL().withMessage("El avatar debe ser una URL válida"),
+    .optional(),
   body("user_id")
     .notEmpty().withMessage("El user_id es obligatorio")
     .isInt().withMessage("El user_id debe ser un número entero"),
@@ -27,8 +26,7 @@ export const updateProfileValidation = [
     .isLength({ min: 2, max: 100 }).withMessage("El apellido debe tener entre 2 y 100 caracteres"),
   body("bio")
     .optional()
-    .isLength({ max: 500 }).withMessage("La bio no puede superar los 500 caracteres"),
+    .isLength({ max: 1000 }).withMessage("La bio no puede superar los 1000 caracteres"),
   body("avatar")
-    .optional()
-    .isURL().withMessage("El avatar debe ser una URL válida"),
+    .optional(),
 ];

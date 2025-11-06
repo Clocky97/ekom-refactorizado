@@ -37,11 +37,17 @@ const Header = () => {
                     <img
                       src={user.profile.avatar}
                       alt="avatar"
-                      className="w-8 h-8 rounded-full object-cover"
-                      style={{ border: '1px solid rgba(0,0,0,0.08)' }}
+                      className="w-5 h-5 rounded-full object-cover"
+                      style={{ 
+                        border: '1px solid rgba(0,0,0,0.08)',
+                        maxWidth: '20px',
+                        maxHeight: '20px',
+                        minWidth: '20px',
+                        minHeight: '20px'
+                      }}
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-sm font-medium text-slate-600" style={{ border: '1px solid rgba(0,0,0,0.08)' }}>
+                    <div className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-medium text-slate-600" style={{ border: '1px solid rgba(0,0,0,0.08)' }}>
                       {((user?.profile?.name || user?.username || 'U').split(' ').map(n => n[0]).slice(0,2).join('')).toUpperCase()}
                     </div>
                   )}

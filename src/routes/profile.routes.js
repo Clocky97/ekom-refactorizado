@@ -21,7 +21,12 @@ router.get("/profile/:id",  getProfileById);
 router.get("/profile/user/:userId", auth, getProfileByUserId);
 // Allow uploading an avatar image with the field name 'avatar'
 router.post("/profile", auth, upload.single('avatar'), createProfileValidation, handleValidation, createProfile);
-router.put("/profile/:id", auth, upload.single('avatar'), updateProfileValidation, handleValidation, updateProfile);
+// Route for updating profile data (JSON)
+router.put("/profile/:id", auth, updateProfileValidation, handleValidation, updateProfile);
+
+// Route for updating profile avatar (multipart/form-data)
+router.put("/profile/:id/avatar", auth, upload.single('avatar'), updateProfile);
+
 router.delete("/profile/:id", auth, admin, deleteProfile);
 router.get("/profile/:userId/average-rating", getUserAvRating);
 
