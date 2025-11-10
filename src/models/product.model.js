@@ -3,24 +3,31 @@ import { sequelize } from "../config/database.js";
 import { CategoryModel } from "./category.model.js";
 
 export const ProductModel = sequelize.define(
-    "product",{
-        "product_name": {
+    "product", {
+        "name": {
             type: DataTypes.STRING,
             allowNull: false
         },
-        "brand": {
-            type: DataTypes.STRING,
+        "description": {
+            type: DataTypes.TEXT,
+            allowNull: false
+        },
+        "price": {
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: false
+        },
+        "stock": {
+            type: DataTypes.INTEGER,
             allowNull: false
         },
         "image": {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
-        "category_id": {
+        "categoryId": {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: "category_id"
         }
-        
-        
     }
 )

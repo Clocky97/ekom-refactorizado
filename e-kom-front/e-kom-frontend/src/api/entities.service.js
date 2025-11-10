@@ -32,10 +32,4 @@ export const entitiesService = {
     const response = await api.delete(`/markets/${id}`);
     return response.data;
   },
-  
-  // PRODUCTS CRUD
-  getAllProducts: async () => {
-    const response = await api.get('/product');
-    return response.data;
-  },
 };

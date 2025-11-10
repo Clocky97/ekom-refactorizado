@@ -1,29 +1,43 @@
 import React from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import Header from '../components/Common/Header.jsx';
 
+// Páginas
 import LoginPage from '../pages/LoginPage.jsx';
 import RegisterPage from '../pages/RegisterPage.jsx';
 import ProfilePage from '../pages/ProfilePage.jsx';
 import HomePage from '../pages/HomePage.jsx';
 import CreatePostPage from '../pages/CreatePostPage.jsx';
-import CategoryAdminPage from '../pages/admin/CategoryAdminPage.jsx'; 
-import MarketAdminPage from '../pages/admin/MarketAdminPage.jsx';
 
-// Componente para proteger RUTAS DE ADMINISTRADOR
+// Admin pages
+import CategoryAdminPage from '../pages/admin/CategoryAdminPage.jsx';
+import MarketAdminPage from '../pages/admin/MarketAdminPage.jsx';
+import ProductAdminPage from '../pages/Admin/ProductAdminPage.jsx';
+import ProductFormPage from '../pages/Admin/ProductFormPage.jsx';
+import ReportAdminPage from '../pages/Admin/ReportAdminPage.jsx';
+import ReportNotificationModal from '../components/admin/ReportNotificationModal.jsx';
+
+// 🔒 Ruta protegida para administradores
 const AdminRoute = ({ element }) => {
   const { isAuthenticated, user, loading } = useAuth();
 
-  if (loading) return <div>Cargando sesión...</div>; 
-  
+  if (loading) return <div>Cargando sesión...</div>;
+
   if (!isAuthenticated || user.role !== 'admin') {
-    return <Navigate to="/" replace state={{ message: "Acceso denegado: solo para administradores" }} />;
+    return (
+      <Navigate
+        to="/"
+        replace
+        state={{ message: 'Acceso denegado: solo para administradores' }}
+      />
+    );
   }
 
   return element;
 };
 
-// Componente para proteger RUTAS DE USUARIO LOGUEADO
+// 🔒 Ruta protegida para usuarios autenticados
 const ProtectedRoute = ({ element }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -31,43 +45,66 @@ const ProtectedRoute = ({ element }) => {
   return isAuthenticated ? element : <Navigate to="/login" replace />;
 };
 
-// Componente Layout de Admin para añadir navegación lateral
+// 📂 Layout del panel de administrador
 const AdminLayout = () => {
-    return (
-        <div style={{ display: 'flex' }}>
-            <aside style={{ width: '200px', padding: '20px', borderRight: '1px solid #ccc' }}>
-                <h3>Panel Admin</h3>
-                <nav>
-                    <p><a href="/admin/categories">Categorías</a></p>
-                    <p><a href="/admin/markets">Locales/Comercios</a></p>
-                    <p>Productos (TODO)</p>
-                    <p>Reportes (TODO)</p>
-                </nav>
-            </aside>
-            <section style={{ flexGrow: 1, padding: '20px' }}>
-                <Outlet />
-            </section>
-        </div>
-    );
+  return (
+    <div className="admin-layout">
+      <div className="admin-content">
+        <aside className="sidebar">
+          <h2>Panel de Administración</h2>
+          <nav>
+            <a href="/admin/categories">Categorías</a>
+            <a href="/admin/markets">Locales/Comercios</a>
+            <a href="/admin/products">Productos</a>
+            <div className="report-section">
+              <ReportNotificationModal />
+              <span>Reportes</span>
+            </div>
+          </nav>
+        </aside>
+        <main className="main-content">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
 };
 
-
+// 🚀 Rutas principales
 const AppRouter = () => {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} /> 
+    <>
+      <Header />
+      <Routes>
+        {/* Rutas públicas */}
+      <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      
+
+      {/* Rutas protegidas */}
       <Route path="/profile" element={<ProtectedRoute element={<ProfilePage />} />} />
-  <Route path="/create-post" element={<ProtectedRoute element={<CreatePostPage />} />} />
-      
+      <Route path="/create-post" element={<ProtectedRoute element={<CreatePostPage />} />} />
+
+      {/* Panel de administrador */}
       <Route path="/admin" element={<AdminRoute element={<AdminLayout />} />}>
+        {/* Categorías */}
         <Route path="categories" element={<CategoryAdminPage />} />
+
+        {/* Mercados */}
         <Route path="markets" element={<MarketAdminPage />} />
-        <Route path="*" element={<div>Selecciona una opción del panel.</div>} />
+
+  {/* 🆕 Productos */}
+  <Route path="products" element={<ProductAdminPage />} />
+  <Route path="products/new" element={<ProductFormPage />} />
+  <Route path="products/edit/:id" element={<ProductFormPage />} />
+
+  {/* Reportes */}
+  <Route path="reports" element={<ReportAdminPage />} />
+
+  <Route path="*" element={<div>Selecciona una opción del panel.</div>} />
       </Route>
 
+      {/* 404 */}
       <Route path="*" element={<div>404 | Página no encontrada</div>} />
     </Routes>
   );
