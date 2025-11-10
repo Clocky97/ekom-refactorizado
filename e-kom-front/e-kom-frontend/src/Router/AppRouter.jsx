@@ -70,13 +70,10 @@ const AdminLayout = () => {
   );
 };
 
-// 🚀 Rutas principales
 const AppRouter = () => {
   return (
-    <>
-      <Header />
-      <Routes>
-        {/* Rutas públicas */}
+    <Routes>
+      {/* Rutas públicas */}
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
@@ -87,21 +84,13 @@ const AppRouter = () => {
 
       {/* Panel de administrador */}
       <Route path="/admin" element={<AdminRoute element={<AdminLayout />} />}>
-        {/* Categorías */}
         <Route path="categories" element={<CategoryAdminPage />} />
-
-        {/* Mercados */}
         <Route path="markets" element={<MarketAdminPage />} />
-
-  {/* 🆕 Productos */}
-  <Route path="products" element={<ProductAdminPage />} />
-  <Route path="products/new" element={<ProductFormPage />} />
-  <Route path="products/edit/:id" element={<ProductFormPage />} />
-
-  {/* Reportes */}
-  <Route path="reports" element={<ReportAdminPage />} />
-
-  <Route path="*" element={<div>Selecciona una opción del panel.</div>} />
+        <Route path="products" element={<ProductAdminPage />} />
+        <Route path="products/new" element={<ProductFormPage />} />
+        <Route path="products/edit/:id" element={<ProductFormPage />} />
+        <Route path="reports" element={<ReportAdminPage />} />
+        <Route path="*" element={<div>Selecciona una opción del panel.</div>} />
       </Route>
 
       {/* 404 */}

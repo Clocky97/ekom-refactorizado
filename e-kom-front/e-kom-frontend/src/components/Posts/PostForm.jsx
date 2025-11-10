@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { postsService } from '../../api/posts.service.js';
-import { entitiesService } from '../../api/entities.service.js'; 
+import { entitiesService } from '../../api/entities.service.js';
+import {
+  getProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "../../api/products.service.js"
 
 const initialFormState = {
   title: '',
@@ -25,7 +32,7 @@ const PostForm = ({ postToEdit, onClose, onSave }) => {
       try {
         const [marketData, productData] = await Promise.all([
           entitiesService.getAllMarkets(),
-          entitiesService.getAllProducts(),
+          getProducts(),
         ]);
         setMarkets(marketData);
         setProducts(productData);

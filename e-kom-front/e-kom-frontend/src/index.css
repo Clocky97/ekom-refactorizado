@@ -50,14 +50,14 @@ a:hover {
   top: 0;
   left: 0;
   right: 0;
+  height: var(--header-height);
   background: var(--header-background);
-  padding: 1rem 2rem;
+  padding: 0 2rem;
   border-bottom: 1px solid rgba(0,0,0,0.08);
   box-shadow: 0 2px 8px rgba(60,40,30,0.04);
   z-index: 1000;
-  height: var(--header-height);
+
   display: flex;
-  align-items: center;
 }
 
 .app-header h2 {
@@ -65,26 +65,6 @@ a:hover {
   color: var(--primary-color);
 }
 
-/* App layout structure */
-.app-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: var(--header-background);
-  padding: 1rem 2rem;
-  border-bottom: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 2px 8px rgba(60,40,30,0.04);
-  z-index: 1000;
-  height: var(--header-height);
-  display: flex;
-  align-items: center;
-}
-
-.app-header h2 {
-  margin: 0;
-  color: var(--primary-color);
-}
 
 body {
   margin: 0;
@@ -447,3 +427,19 @@ thead th { background: rgba(139,94,60,0.06); color: var(--text-color); font-weig
 /* Small helpers */
 .muted { color: var(--muted-color); }
 
+/* --- Header fijo sin alterar el estilo existente --- */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+/* --- Deja espacio para el header fijo --- */
+body {
+  margin: 0;
+  padding-top: 64px; /* ajusta si tu header es más alto */
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
