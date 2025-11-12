@@ -1,51 +1,22 @@
-import api from './api';
+// DEPRECATED: Products removed. These helpers exist to avoid import errors in admin pages.
+// getProducts returns an empty array. Other operations return a rejected promise indicating removal.
 
-// Obtener todos los productos
 export const getProducts = async () => {
-  try {
-    const response = await api.get('/product');
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
-  }
+  return [];
 };
 
-// Obtener un producto por ID
 export const getProductById = async (id) => {
-  try {
-    const response = await api.get(`/product/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
-  }
+  return Promise.reject(new Error('Product resource removed'));
 };
 
-// Crear un nuevo producto
 export const createProduct = async (productData) => {
-  try {
-    const response = await api.post('/product', productData);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
-  }
+  return Promise.reject(new Error('Product resource removed'));
 };
 
-// Actualizar un producto
 export const updateProduct = async (id, productData) => {
-  try {
-    const response = await api.put(`/product/${id}`, productData);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
-  }
+  return Promise.reject(new Error('Product resource removed'));
 };
 
-// Eliminar un producto
 export const deleteProduct = async (id) => {
-  try {
-    const response = await api.delete(`/product/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error.message;
-  }
+  return Promise.reject(new Error('Product resource removed'));
 };

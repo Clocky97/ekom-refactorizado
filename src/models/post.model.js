@@ -1,7 +1,6 @@
 import { sequelize } from "../config/database.js";
 import { DataTypes } from "sequelize";
-import { ProductModel } from "./product.model.js";
-import  User  from "./user.model.js";
+import User from "./user.model.js";
 
 export const PostModel = sequelize.define(
     "post", {
@@ -21,11 +20,11 @@ export const PostModel = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        "product_id": {
-            type: DataTypes.INTEGER,
-            allowNull: false
-        },
         "offer_id": {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
+        "category_id": {
             type: DataTypes.INTEGER,
             allowNull: true
         },

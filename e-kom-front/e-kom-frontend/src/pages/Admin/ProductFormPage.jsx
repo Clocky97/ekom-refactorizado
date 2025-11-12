@@ -1,52 +1,29 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { getProductById } from '../../api/products.service';
-import { entitiesService } from '../../api/entities.service';
-import ProductForm from '../../components/admin/ProductForm';
-import { useToast } from '../../context/ToastContext';
+import { useNavigate } from 'react-router-dom';
 
 const ProductFormPage = () => {
-  const { id } = useParams();
-  const { showToast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [product, setProduct] = useState(null);
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Cargar categorías
-        const categoriesData = await entitiesService.getAllCategories();
-        setCategories(categoriesData);
-
-        // Si estamos en modo edición, cargar el producto
-        if (id) {
-          const productData = await getProductById(id);
-          setProduct(productData);
-        }
-      } catch (error) {
-        showToast(error.message || 'Error al cargar los datos', 'error');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [id]);
-
-  if (loading) {
-    return <div className="text-center p-4">Cargando datos...</div>;
-  }
+  const navigate = useNavigate();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        {id ? 'Editar Producto' : 'Crear Nuevo Producto'}
-      </h1>
-      <ProductForm
-        product={product}
-        categories={categories}
-      />
+    <div className="container mx-auto px-4 py-8 text-center">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Crear/Editar Productos</h1>
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <p className="text-yellow-800 text-lg font-semibold mb-4">
+          ⚠️ Recursos de Productos Deprecados
+        </p>
+        <p className="text-yellow-700 mb-4">
+          La funcionalidad de gestión de productos ha sido removida del sistema.
+        </p>
+        <p className="text-yellow-700 mb-6">
+          Ahora, los productos se cargan directamente como parte de las publicaciones (posts).
+          Los datos de precio, marca e imagen se ingresan directamente al crear una publicación.
+        </p>
+        <button
+          onClick={() => navigate('/admin/posts')}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          Ir a Gestión de Publicaciones
+        </button>
+      </div>
     </div>
   );
 };

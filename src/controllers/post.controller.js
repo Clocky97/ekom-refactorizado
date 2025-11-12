@@ -1,10 +1,12 @@
 import { PostModel } from "../models/post.model.js";
 import { User, Profile } from "../models/relations.index.js";
+import { MarketModel } from "../models/market.model.js";
+import { CategoryModel } from "../models/category.model.js";
 import DeletionLog from "../models/deletion.model.js";
 
 export const getAllPost = async (req, res) => {
     try {
-        // Include the post owner (user) and their profile so frontend can display owner names
+        // Include the post owner (user), their profile, the market, and category so frontend can display names
         const posts = await PostModel.findAll({
             include: [
                 {
@@ -14,6 +16,16 @@ export const getAllPost = async (req, res) => {
                     include: [
                         { model: Profile, as: 'profile', attributes: ['name', 'lastname'] }
                     ]
+                },
+                {
+                    model: MarketModel,
+                    as: 'local',
+                    attributes: ['id', 'name', 'type']
+                },
+                {
+                    model: CategoryModel,
+                    as: 'categoria',
+                    attributes: ['id', 'name']
                 }
             ]
         });
@@ -30,6 +42,10 @@ export const getAllPost = async (req, res) => {
             } else {
                 obj.user_name = null;
             }
+            // Add market name for frontend display
+            obj.market_name = obj.local?.name || 'Desconocido';
+            // Add category name for frontend display
+            obj.category_name = obj.categoria?.name || null;
             return obj;
         });
 
@@ -50,6 +66,16 @@ export const getPostById = async (req, res) => {
                     include: [
                         { model: Profile, as: 'profile', attributes: ['name', 'lastname'] }
                     ]
+                },
+                {
+                    model: MarketModel,
+                    as: 'local',
+                    attributes: ['id', 'name', 'type']
+                },
+                {
+                    model: CategoryModel,
+                    as: 'categoria',
+                    attributes: ['id', 'name']
                 }
             ]
         });
@@ -65,6 +91,10 @@ export const getPostById = async (req, res) => {
         } else {
             obj.user_name = null;
         }
+        // Add market name for frontend display
+        obj.market_name = obj.local?.name || 'Desconocido';
+        // Add category name for frontend display
+        obj.category_name = obj.categoria?.name || null;
 
         res.status(200).json(obj);
     } catch (error) {;
@@ -78,7 +108,7 @@ export const createPost = async (req, res) => {
         // Debug: show incoming authorization header to troubleshoot "Token requerido"
         console.log('createPost - Authorization header:', req.headers.authorization);
 
-        const { title, content, price, brand, market_id, product_id, offer_id } = req.body;
+        const { title, content, price, brand, market_id, category_id, offer_id } = req.body;
         
         // Require an uploaded image
         if (!req.file) {
@@ -86,10 +116,10 @@ export const createPost = async (req, res) => {
         }
 
         // Validar datos requeridos
-        if (!title || !content || !price || !market_id || !product_id) {
+        if (!title || !content || !price || !market_id || !category_id) {
             return res.status(400).json({ 
                 message: "Faltan campos requeridos",
-                required: ["title", "content", "price", "market_id", "product_id", "image"]
+                required: ["title", "content", "price", "market_id", "category_id", "image"]
             });
         }
 
@@ -101,7 +131,7 @@ export const createPost = async (req, res) => {
             price,
             brand,
             market_id,
-            product_id,
+            category_id,
             offer_id: offer_id || null,
             image: imagePath,
             user_id: req.user.id

@@ -39,75 +39,58 @@ const ReportNotificationModal = () => {
   };
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
-      <button onClick={handleIconClick} style={{ background: 'none', border: 'none', cursor: 'pointer', position: 'relative' }}>
+    <div className="relative inline-block">
+      <button 
+        onClick={handleIconClick} 
+        className="bg-none border-none cursor-pointer relative p-2 hover:opacity-70 transition"
+      >
         <BellIcon hasReports={reports.length > 0} />
         {reports.length > 0 && (
-          <span style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            background: '#ef4444',
-            color: 'white',
-            borderRadius: '50%',
-            padding: '2px 6px',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            minWidth: '20px',
-            textAlign: 'center',
-          }}>{reports.length}</span>
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+            {reports.length}
+          </span>
         )}
       </button>
       {showModal && (
-        <div style={{
-          position: 'absolute',
-          top: '40px',
-          right: 0,
-          background: 'white',
-          border: '1px solid #ccc',
-          borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          zIndex: 100,
-          minWidth: '260px',
-        }}>
-          <div style={{ padding: '16px' }}>
-            <h4 style={{ marginBottom: '12px', fontWeight: 'bold' }}>Reportes recientes</h4>
+        <div className="absolute top-full right-0 mt-2 bg-white border border-slate-200 rounded-lg shadow-2xl z-50 min-w-80 max-w-md">
+          <div className="p-5 border-b border-slate-200">
+            <h4 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <span>🔔</span>
+              Reportes recientes
+            </h4>
+          </div>
+          
+          <div className="max-h-64 overflow-y-auto">
             {reports.length === 0 ? (
-              <p>No hay reportes nuevos.</p>
+              <div className="p-5 text-center text-slate-600">
+                <p className="text-sm">No hay reportes nuevos.</p>
+              </div>
             ) : (
-              <ul style={{ maxHeight: '180px', overflowY: 'auto', marginBottom: '12px' }}>
+              <ul className="divide-y divide-slate-200">
                 {reports.slice(0, 5).map(report => (
-                  <li key={report.id} style={{ marginBottom: '8px', fontSize: '14px' }}>
-                    <span style={{ fontWeight: 'bold' }}>#{report.id}</span> - {report.reason}
+                  <li key={report.id} className="p-4 hover:bg-slate-50 transition">
+                    <p className="text-sm">
+                      <span className="font-bold text-blue-600">#{report.id}</span>
+                      <span className="text-slate-600"> - </span>
+                      <span className="text-slate-700">{report.reason}</span>
+                    </p>
                   </li>
                 ))}
               </ul>
             )}
+          </div>
+
+          <div className="border-t border-slate-200 p-4 space-y-2">
             <button
               onClick={handleGoToReports}
-              style={{
-                background: '#2563eb',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                padding: '8px 16px',
-                cursor: 'pointer',
-                width: '100%',
-                fontWeight: 'bold',
-              }}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-600 transition flex items-center justify-center gap-2"
             >
+              <span>📊</span>
               Ver todos los reportes
             </button>
             <button
               onClick={() => setShowModal(false)}
-              style={{
-                background: 'none',
-                color: '#555',
-                border: 'none',
-                marginTop: '8px',
-                cursor: 'pointer',
-                width: '100%',
-              }}
+              className="w-full bg-slate-100 text-slate-700 font-semibold py-2 px-4 rounded-lg hover:bg-slate-200 transition"
             >
               Cerrar
             </button>

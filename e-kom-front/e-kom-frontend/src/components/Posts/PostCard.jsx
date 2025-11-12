@@ -27,7 +27,7 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
   // Si no tenemos el nombre del mercado en el post, intentamos resolverlo por ID
   useEffect(() => {
     const resolveMarketName = async () => {
-      if (post.market_name || post.marketName || post.market) return;
+      if (post.market_name) return; // Si ya tenemos market_name, no hacer nada
       if (!post.market_id) return;
       try {
         const markets = await entitiesService.getAllMarkets();
@@ -115,7 +115,8 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
         <div>
           <p><strong>Precio:</strong> ${post.price}</p>
           <p><strong>Marca:</strong> {post.brand}</p>
-          <p><strong>Local:</strong> {post.market_name || post.marketName || post.market || post.market_id || 'Desconocido'}</p>
+          <p><strong>Local:</strong> {post.market_name || 'Desconocido'}</p>
+          <p><strong>Categoría:</strong> {post.category_name || 'Sin categoría'}</p>
         </div>
         <div className="text-right">
           <p className="text-sm">Calificación:</p>

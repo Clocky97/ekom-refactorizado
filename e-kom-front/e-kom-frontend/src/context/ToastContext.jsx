@@ -1,34 +1,58 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 
 const ToastContext = createContext(null);
 
 export const useToast = () => useContext(ToastContext);
 
-let idCounter = 1;
-
+// Thin wrapper so existing code using push/showToast works
 export const ToastProvider = ({ children }) => {
-  const [toasts, setToasts] = useState([]);
+  const push = (message, { type = 'info', timeout = 4000 } = {}) => {
+    const options = { duration: timeout };
+    switch (type) {
+      case 'success':
+        toast.success(message, options);
+        break;
+      case 'error':
+        toast.error(message, options);
+        break;
+      case 'loading':
+        toast.loading(message, options);
+        break;
+      default:
+        toast(message, options);
+    }
+  };
 
-  const push = useCallback((message, { type = 'info', timeout = 3000 } = {}) => {
-    const id = idCounter++;
-    setToasts(t => [...t, { id, message, type }]);
-    if (timeout > 0) setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), timeout);
-    return id;
-  }, []);
+  const remove = (id) => {
+    // react-hot-toast dismiss accepts id or nothing
+    try { toast.dismiss(id); } catch (e) { /* ignore */ }
+  };
 
-  const remove = useCallback((id) => setToasts(t => t.filter(x => x.id !== id)), []);
+  const showToast = (message, type = 'info', timeout = 4000) => push(message, { type, timeout });
 
   return (
-    <ToastContext.Provider value={{ push, remove }}>
+    <ToastContext.Provider value={{ push, remove, showToast }}>
       {children}
-      <div style={{ position: 'fixed', right: 16, top: 16, zIndex: 60 }}>
-        {toasts.map(t => (
-          <div key={t.id} style={{ marginBottom: 8, minWidth: 240, padding: '10px 14px', borderRadius: 8, color: '#042', background: t.type === 'error' ? '#fee' : t.type === 'success' ? '#e6ffef' : '#eef2ff', boxShadow: '0 6px 18px rgba(0,0,0,0.08)' }}>
-            <strong style={{ display: 'block', marginBottom: 4 }}>{t.type === 'error' ? 'Error' : t.type === 'success' ? 'OK' : 'Info'}</strong>
-            <div style={{ fontSize: 13 }}>{t.message}</div>
-          </div>
-        ))}
-      </div>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          // Default options for all toasts
+          duration: 4000,
+          style: {
+            borderRadius: '12px',
+            background: '#fff',
+            color: '#0f172a',
+            boxShadow: '0 8px 30px rgba(2,6,23,0.12)'
+          },
+          success: {
+            style: { background: '#ecfdf5', color: '#064e3b' }
+          },
+          error: {
+            style: { background: '#fff1f2', color: '#7f1d1d' }
+          }
+        }}
+      />
     </ToastContext.Provider>
   );
 };
