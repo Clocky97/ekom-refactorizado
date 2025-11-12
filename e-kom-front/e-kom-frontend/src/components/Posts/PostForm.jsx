@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { postsService } from '../../api/posts.service.js';
 import { entitiesService } from '../../api/entities.service.js';
+import { offersService } from '../../api/offers.service.js';
 
 const initialFormState = {
   title: '',
@@ -19,16 +20,19 @@ const PostForm = ({ postToEdit, onClose, onSave }) => {
   
   const [markets, setMarkets] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [offers, setOffers] = useState([]);
 
   useEffect(() => {
     const fetchEntities = async () => {
       try {
-        const [marketData, categoryData] = await Promise.all([
+        const [marketData, categoryData, offerData] = await Promise.all([
           entitiesService.getAllMarkets(),
           entitiesService.getAllCategories(),
+          offersService.getAllOffers(),
         ]);
         setMarkets(marketData);
         setCategories(categoryData);
+        setOffers(offerData);
 
         if (postToEdit) {
           setFormData({
@@ -50,7 +54,7 @@ const PostForm = ({ postToEdit, onClose, onSave }) => {
 
       } catch (err) {
         console.error("Error al cargar entidades:", err);
-        setError('Error al cargar mercados o categorías.');
+        setError('Error al cargar mercados, categorías u ofertas.');
       } finally {
         setLoadingEntities(false);
       }
@@ -276,6 +280,31 @@ const PostForm = ({ postToEdit, onClose, onSave }) => {
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* Oferta (opcional) */}
+          <div className="group">
+            <label className="block text-sm font-bold text-slate-800 mb-2 flex items-center gap-2">
+              <span className="text-lg">🎁</span>
+              <span>¿Tiene Oferta? (Opcional)</span>
+            </label>
+            <select 
+              name="offer_id" 
+              value={formData.offer_id} 
+              onChange={handleChange}
+              className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white hover:border-red-300 transition group-hover:shadow-md cursor-pointer appearance-none text-slate-700 font-semibold"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23DC2626' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 0.75rem center',
+                paddingRight: '2.5rem'
+              }}
+            >
+              <option value="" className="text-slate-500 font-semibold">— Sin oferta —</option>
+              {offers.map(o => (
+                <option key={o.id} value={o.id} className="text-slate-700 font-semibold">✨ {o.name} ({o.description})</option>
+              ))}
+            </select>
           </div>
 
           {/* Imagen */}

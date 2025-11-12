@@ -9,6 +9,7 @@ import RegisterPage from '../pages/RegisterPage.jsx';
 import ProfilePage from '../pages/ProfilePage.jsx';
 import HomePage from '../pages/HomePage.jsx';
 import CreatePostPage from '../pages/CreatePostPage.jsx';
+import CartPage from '../pages/CartPage.jsx';
 
 // Admin pages
 import CategoryAdminPage from '../pages/admin/CategoryAdminPage.jsx';
@@ -77,6 +78,7 @@ const AppRouter = () => {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+  <Route path="/cart" element={<CartPage />} />
 
       {/* Rutas protegidas */}
       <Route path="/profile" element={<ProtectedRoute element={<ProfilePage />} />} />

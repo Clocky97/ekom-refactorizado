@@ -1,9 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { motion } from 'framer-motion';
+import { useCart } from '../../context/CartContext.jsx';
 
 const Header = () => {
   const { isAuthenticated, user, logout } = useAuth();
+  const { items, setOpen } = useCart();
   const isAdmin = isAuthenticated && user?.role === 'admin';
 
   // Construimos la URL completa del avatar
@@ -42,13 +45,22 @@ const Header = () => {
 
         {/* 🔸 CENTRO — exactamente centrado */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
-          <h1 className="text-2xl font-bold tracking-wide text-slate-800 select-none">
-            E-KOM
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-wide text-slate-800 select-none">
+              E-KOM
+            </h1>
+            {/* Visible test: pulsing dot to confirm framer-motion is active */}
+            <motion.span
+              className="w-3 h-3 rounded-full bg-emerald-500"
+              animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
+              transition={{ duration: 1.2, repeat: Infinity }}
+              aria-hidden
+            />
+          </div>
         </div>
 
         {/* 🔹 DERECHA — pegado al borde */}
-        <div className="flex items-center gap-3 absolute right-0 pr-6">
+  <div className="flex items-center gap-3 absolute right-0 pr-6">
           {!isAuthenticated ? (
             <>
               <Link
@@ -66,7 +78,7 @@ const Header = () => {
               </Link>
             </>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-6">
               <Link
                 to="/profile"
                 className="flex items-center gap-2 text-sm text-slate-700 hover:text-slate-900"
@@ -88,7 +100,7 @@ const Header = () => {
                   />
                 ) : (
                   <div
-                    className="rounded-full bg-slate-100 flex items-center justify-center text-[11px] font-medium text-slate-600 border border-slate-300 relative top-[2px]"
+                    className="rounded-full bg-slate-100 border border-slate-300 relative top-[2px]"
                     style={{
                       width: '28px',
                       height: '28px',
@@ -97,14 +109,7 @@ const Header = () => {
                       maxWidth: '28px',
                       maxHeight: '28px',
                     }}
-                  >
-                    {((user?.profile?.name || user?.username || 'U')
-                      .split(' ')
-                      .map((n) => n[0])
-                      .slice(0, 2)
-                      .join('')
-                    ).toUpperCase()}
-                  </div>
+                  />
                 )}
 
 
@@ -112,6 +117,33 @@ const Header = () => {
                   {user?.profile?.name || user?.username || 'Perfil'}
                 </span>
               </Link>
+
+              <button
+                onClick={() => {
+                  // Open cart in a new tab/page instead of showing the sidebar
+                  try {
+                    const url = `${window.location.origin}/cart`;
+                    window.open(url, '_blank');
+                  } catch (e) {
+                    // fallback to opening just '/cart'
+                    window.open('/cart', '_blank');
+                  }
+                }}
+                className="relative text-slate-700 hover:text-slate-900 transition mr-2"
+                title="Ver carrito en nueva pestaña"
+              >
+                <span className="text-xl">🛒</span>
+                {items.length > 0 && (
+                  <motion.span
+                    className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 font-bold"
+                    animate={{ scale: [1, 1.15, 1] }}
+                    transition={{ duration: 0.9, repeat: Infinity }}
+                    key={items.length}
+                  >
+                    {items.length}
+                  </motion.span>
+                )}
+              </button>
 
               <button
                 onClick={logout}

@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext.jsx';
 import AppRouter from './Router/AppRouter.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import Header from './components/Common/Header.jsx';
+import CartSidebar from './components/Common/CartSidebar.jsx';
 import './App.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
       <main>
         <AppRouter />
       </main>
+      <CartSidebar />
     </ToastProvider>
   );
 }

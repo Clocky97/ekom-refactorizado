@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { postsService } from '../../api/posts.service.js';
 import { entitiesService } from '../../api/entities.service.js';
 import api from '../../api/api.js';
+import { useCart } from '../../context/CartContext.jsx';
 
 const PostCard = ({ post, onDelete, onUpdate }) => {
   const { isAuthenticated, user } = useAuth();
@@ -78,8 +80,27 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
 
   const serverBase = api.defaults.baseURL ? api.defaults.baseURL.replace(/\/ekom\/?$/, '') : '';
 
+  const { add, remove, isInCart } = useCart();
+  const saved = isInCart(post.id);
+  const handleToggleSave = () => {
+    if (saved) remove(post.id);
+    else add({ ...post, image: post.image ? `${serverBase}${post.image}` : null });
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  };
+
   return (
-    <div className="post-card">
+    <motion.div
+      className="post-card"
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      whileHover={{ y: -4 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+    >
       <div className="flex items-center justify-between space-x-4">
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           {/* Post image */}
@@ -97,6 +118,9 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
           </div>
         </div>
         <div className="flex gap-2 items-center">
+          <button onClick={handleToggleSave} title={saved ? 'Quitar guardado' : 'Guardar publicación'} className={`p-2 rounded ${saved ? 'bg-green-600 text-white' : 'bg-slate-200 text-slate-800'}`}>
+            {saved ? '✓' : 'Guardar'}
+          </button>
           {/* Social links */}
           {post.social?.facebook && (
             <a href={post.social.facebook} target="_blank" rel="noreferrer" title="Facebook">
@@ -117,6 +141,9 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
           <p><strong>Marca:</strong> {post.brand}</p>
           <p><strong>Local:</strong> {post.market_name || 'Desconocido'}</p>
           <p><strong>Categoría:</strong> {post.category_name || 'Sin categoría'}</p>
+          {post.offer_id && post.offer_name && (
+            <p className="mt-1 text-red-600 font-bold text-sm">🎁 Oferta: {post.offer_name}</p>
+          )}
         </div>
         <div className="text-right">
           <p className="text-sm">Calificación:</p>
@@ -125,39 +152,58 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
       </div>
 
       {isOwner && (
-        <div className="mt-4 flex gap-2">
-          <button onClick={() => onUpdate(post.id)} className="px-3 py-1 bg-amber-500 text-white rounded-md">Editar</button>
-          <button onClick={() => onDelete(post.id)} className="px-3 py-1 bg-red-500 text-white rounded-md">Eliminar</button>
-        </div>
+        <motion.div className="mt-4 flex gap-2">
+          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => onUpdate(post.id)} className="px-3 py-1 bg-amber-500 text-white rounded-md">Editar</motion.button>
+          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => onDelete(post.id)} className="px-3 py-1 bg-red-500 text-white rounded-md">Eliminar</motion.button>
+        </motion.div>
       )}
       
       {isAuthenticated && !isOwner && (
-        <div className="mt-4 flex items-center gap-3">
-          <button onClick={() => setShowRatingModal(true)} className="px-3 py-1 bg-amber-400 text-white rounded-md">Calificar</button>
-          <button onClick={handleReport} className="px-3 py-1 bg-red-600 text-white rounded-md">Reportar</button>
-        </div>
+        <motion.div className="mt-4 flex items-center gap-3">
+          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setShowRatingModal(true)} className="px-3 py-1 bg-amber-400 text-white rounded-md">Calificar</motion.button>
+          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleReport} className="px-3 py-1 bg-red-600 text-white rounded-md">Reportar</motion.button>
+        </motion.div>
       )}
 
       {/* Rating Modal */}
-      {showRatingModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-[320px]">
-            <h4 className="text-lg font-semibold mb-3">Calificar esta publicación</h4>
-            <div className="flex justify-center gap-2 mb-4">
-              {[1,2,3,4,5].map(n => (
-                <button key={n} onClick={() => setSelectedRating(n)} className={`text-2xl ${n <= selectedRating ? 'text-yellow-400' : 'text-slate-300'}`}>
-                  ★
-                </button>
-              ))}
+      <AnimatePresence>
+        {showRatingModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className="bg-white rounded-lg p-6 w-[320px]"
+            >
+              <h4 className="text-lg font-semibold mb-3">Calificar esta publicación</h4>
+              <div className="flex justify-center gap-2 mb-4">
+                {[1,2,3,4,5].map(n => (
+                  <motion.button
+                    key={n}
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setSelectedRating(n)}
+                    className={`text-2xl ${n <= selectedRating ? 'text-yellow-400' : 'text-slate-300'}`}
+                  >
+                    ★
+                  </motion.button>
+                ))}
             </div>
             <div className="flex justify-between">
-              <button onClick={() => { setShowRatingModal(false); setSelectedRating(0); }} className="px-3 py-1 border rounded-md">Cancelar</button>
-              <button onClick={async () => { await handleRate(selectedRating); setShowRatingModal(false); setSelectedRating(0); }} className="px-3 py-1 bg-amber-500 text-white rounded-md">Enviar</button>
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => { setShowRatingModal(false); setSelectedRating(0); }} className="px-3 py-1 border rounded-md">Cancelar</motion.button>
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={async () => { await handleRate(selectedRating); setShowRatingModal(false); setSelectedRating(0); }} className="px-3 py-1 bg-amber-500 text-white rounded-md">Enviar</motion.button>
             </div>
-          </div>
-        </div>
-      )}
-    </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

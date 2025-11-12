@@ -2,6 +2,7 @@ import { PostModel } from "../models/post.model.js";
 import { User, Profile } from "../models/relations.index.js";
 import { MarketModel } from "../models/market.model.js";
 import { CategoryModel } from "../models/category.model.js";
+import { OfferModel } from "../models/offer.model.js";
 import DeletionLog from "../models/deletion.model.js";
 
 export const getAllPost = async (req, res) => {

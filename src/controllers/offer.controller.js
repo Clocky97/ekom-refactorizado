@@ -37,10 +37,13 @@ export const createOffer = async (req, res) => {
 
 export const updateOffer = async (req, res) => {
     const {name, description} = req.body;
+    const { id } = req.params;
     try {
         const offer = await OfferModel.update({
             name: name,
             description: description
+        }, {
+            where: { id }
         });
         res.status(200).json(offer);
         
@@ -52,7 +55,9 @@ export const updateOffer = async (req, res) => {
 
 export const deleteOffer = async (req, res) => {
     try {
-        await OfferModel.findByPk(req.params.id);
+        await OfferModel.destroy({
+            where: { id: req.params.id }
+        });
         res.status(200).json({
             message: "Oferta eliminada correctamente"
         });
