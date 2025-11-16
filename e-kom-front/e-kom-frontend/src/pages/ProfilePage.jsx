@@ -45,7 +45,7 @@ useEffect(() => {
         style={{
           textAlign: "center",
           marginTop: "2rem",
-          color: "var(--brand-700)",
+          color: "var(--text)",
         }}
       >
         Cargando tu perfil…

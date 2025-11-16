@@ -136,7 +136,7 @@ const HomePage = () => {
         {loading ? (
           <p style={{ textAlign: "center", marginTop: "2rem" }}>Cargando...</p>
         ) : filteredPosts.length === 0 ? (
-          <p style={{ textAlign: "center", marginTop: "2rem", color: "var(--brand-700)" }}>
+          <p style={{ textAlign: "center", marginTop: "2rem", color: "var(--text)" }}>
             No se encontraron publicaciones.
           </p>
         ) : (

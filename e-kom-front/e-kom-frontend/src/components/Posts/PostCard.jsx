@@ -111,10 +111,10 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
       {/* Encabezado */}
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div>
-          <h3 style={{ fontSize: "1.3rem", fontWeight: 700, color: "var(--brand-800)", margin: 0 }}>
+          <h3 style={{ fontSize: "1.3rem", fontWeight: 700, color: "var(--primary-dark)", margin: 0 }}>
             {post.title}
           </h3>
-          <p style={{ fontSize: "0.8rem", color: "var(--brand-600)" }}>
+          <p style={{ fontSize: "0.8rem", color: "var(--primary)" }}>
             Por <strong>{post.user_name}</strong> ·{" "}
             {post.createdAt ? new Date(post.createdAt).toLocaleString() : ""}
           </p>
@@ -131,7 +131,7 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
       </div>
 
       {/* Descripción */}
-      <p style={{ marginTop: "0.6rem", lineHeight: 1.5, color: "var(--brand-700)" }}>
+      <p style={{ marginTop: "0.6rem", lineHeight: 1.5, color: "var(--text)" }}>
         {post.content}
       </p>
 
@@ -147,7 +147,7 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
       </div>
 
       {/* Rating */}
-      <div style={{ marginTop: "1rem", fontWeight: 600, color: "var(--brand-700)" }}>
+      <div style={{ marginTop: "1rem", fontWeight: 600, color: "var(--text)" }}>
         ⭐ {averageRating.toFixed(2)}
       </div>
 

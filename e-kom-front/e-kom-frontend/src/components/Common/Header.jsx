@@ -13,7 +13,7 @@ export default function Header() {
     <header className="navbar">
       {/* Logo */}
       <Link to="/" className="navbar-title">
-        E-Kom
+        E-KOM
       </Link>
 
       {/* Navegación */}

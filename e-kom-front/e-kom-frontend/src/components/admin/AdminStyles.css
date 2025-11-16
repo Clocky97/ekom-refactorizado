@@ -53,7 +53,7 @@
 }
 
 .adm-btn {
-  background: #b07a4f;
+  background: var(--primary);
   color: white;
   padding: 10px 14px;
   border: none;
@@ -87,7 +87,7 @@
 
 /* TÍTULOS */
 .adm-title {
-  color: #4c2f1c;
+  color: var(--primary-dark);
   font-size: 26px;
   margin-bottom: 20px;
 }
@@ -95,7 +95,7 @@
 .adm-subtitle {
   font-size: 18px;
   margin: 20px 0 10px;
-  color: #5c3b25;
+  color: var(--primary-dark);
 }
 
 /* LISTA */
@@ -138,7 +138,7 @@
 .adm-loading {
   text-align: center;
   padding: 40px;
-  color: #5c3b25;
+  color: var(--primary-dark);
   font-weight: bold;
 }
 
@@ -185,14 +185,14 @@
 
 .adm-input {
   padding: 8px 10px;
-  border: 1px solid #b39578;
+  border: 1px solid rgba(179,149,120,0.9);
   border-radius: 6px;
   background: #fff;
 }
 
 .adm-btn {
   padding: 10px;
-  background: #b07a4f;
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 6px;
@@ -267,7 +267,7 @@
   text-align: left;
   font-size: 13px;
   font-weight: 700;
-  color: #6f4a28;
+  color: var(--primary-dark);
   text-transform: uppercase;
   border-bottom: 2px solid #e0c5a8;
 }
