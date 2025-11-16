@@ -2,12 +2,14 @@
 
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useToast } from "../../context/ToastContext.jsx";
 import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const { login } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const handleChange = (e) =>
@@ -19,9 +21,12 @@ export default function LoginForm() {
 
     try {
       await login({ email: form.email, password: form.password });
+      showToast("Inicio de sesión correcto.", "success");
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.error || "Error al iniciar sesión.");
+      const msg = err.response?.data?.error || "Error al iniciar sesión.";
+      setError(msg);
+      showToast(msg, "error");
     }
   };
 

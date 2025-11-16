@@ -2,10 +2,12 @@
 
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useToast } from "../../context/ToastContext.jsx";
 import { useNavigate } from "react-router-dom";
 
 export default function RegisterForm() {
   const { register } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -27,10 +29,13 @@ export default function RegisterForm() {
 
     try {
       const res = await register(form);
-      alert(res.message || "Registro exitoso.");
+      const msg = res.message || "Registro exitoso.";
+      showToast(msg, "success");
       navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.error || "Error al registrarse.");
+      const msg = err.response?.data?.error || "Error al registrarse.";
+      setError(msg);
+      showToast(msg, "error");
     }
   };
 
