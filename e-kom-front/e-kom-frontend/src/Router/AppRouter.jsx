@@ -7,6 +7,7 @@ import Header from '../components/Common/Header.jsx';
 import LoginPage from '../pages/LoginPage.jsx';
 import RegisterPage from '../pages/RegisterPage.jsx';
 import ProfilePage from '../pages/ProfilePage.jsx';
+import UserProfilePage from '../pages/UserProfilePage.jsx';
 import HomePage from '../pages/HomePage.jsx';
 import CreatePostPage from '../pages/CreatePostPage.jsx';
 import CartPage from '../pages/CartPage.jsx';
@@ -99,6 +100,11 @@ const AppRouter = () => {
 <Route 
   path="/profile" 
   element={<ProtectedRoute element={<ProfilePage />} />} 
+/>
+
+<Route 
+  path="/user/:userId" 
+  element={<ProtectedRoute element={<UserProfilePage />} />} 
 />
 
 <Route 

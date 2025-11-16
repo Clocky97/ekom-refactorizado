@@ -54,12 +54,12 @@ CategoryModel.hasMany(PostModel, {
 })
 
 // Un usuario puede reportar muchos posts
-User.hasMany(Report);
-Report.belongsTo(User);
+User.hasMany(Report, { as: 'reports' });
+Report.belongsTo(User, { as: 'user' });
 
 // Un post puede tener muchos reportes
-PostModel.hasMany(Report);
-Report.belongsTo(PostModel);
+PostModel.hasMany(Report, { as: 'reportes' });
+Report.belongsTo(PostModel, { as: 'post' });
 
 // Un usuario puede puntuar muchos posts
 User.hasMany(Rating);

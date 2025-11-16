@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { postsService } from '../../api/posts.service.js';
 import { entitiesService } from '../../api/entities.service.js';
@@ -8,6 +9,7 @@ import { useCart } from '../../context/CartContext.jsx';
 
 const PostCard = ({ post, onDelete, onUpdate }) => {
   const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
   const isOwner = isAuthenticated && (user.id === post.user_id || user.role === 'admin');
 
   const [averageRating, setAverageRating] = useState(0);
@@ -115,7 +117,24 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
             {post.title}
           </h3>
           <p style={{ fontSize: "0.8rem", color: "var(--primary)" }}>
-            Por <strong>{post.user_name}</strong> ·{" "}
+            Por{" "}
+            <button
+              onClick={() => navigate(`/user/${post.user_id}`)}
+              style={{
+                background: "none",
+                border: "none",
+                color: "var(--primary-dark)",
+                fontWeight: "bold",
+                cursor: "pointer",
+                textDecoration: "none",
+                padding: 0,
+              }}
+              onMouseEnter={(e) => (e.target.style.textDecoration = "underline")}
+              onMouseLeave={(e) => (e.target.style.textDecoration = "none")}
+            >
+              {post.user_name}
+            </button>
+            {" "}·{" "}
             {post.createdAt ? new Date(post.createdAt).toLocaleString() : ""}
           </p>
         </div>

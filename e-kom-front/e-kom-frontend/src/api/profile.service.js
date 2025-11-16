@@ -15,6 +15,11 @@ export const profileService = {
     return response.data;
   },
 
+  getUserAverageRating: async (userId) => {
+    const response = await api.get(`/profile/${userId}/average-rating`);
+    return response.data;
+  },
+
   updateProfile: async (profileId, profileData) => {
     const response = await api.put(`/profile/${profileId}`, profileData);
     return response.data;

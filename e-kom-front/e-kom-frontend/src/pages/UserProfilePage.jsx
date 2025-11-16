@@ -1,77 +1,54 @@
-// src/pages/ProfilePage.jsx
+// src/pages/UserProfilePage.jsx
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useParams, useNavigate } from "react-router-dom";
 import { profileService } from "../api/profile.service.js";
-import { useNavigate } from "react-router-dom";
 import './ProfilePage.css'
 
-const ProfilePage = () => {
-  const { user, logout } = useAuth();
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [averageRating, setAverageRating] = useState(null);
-  const [avatarError, setAvatarError] = useState(false);
+const UserProfilePage = () => {
+  const { userId } = useParams();
   const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [avatarError, setAvatarError] = useState(false);
+  const [averageRating, setAverageRating] = useState(null);
 
-  const loadProfile = async () => {
-    try {
-      const data = await profileService.getMyProfile();
-      setProfile(data);
-      // fetch average rating for current user's posts
+  useEffect(() => {
+    const loadUserProfile = async () => {
       try {
-        const avg = await profileService.getUserAverageRating(data?.user?.id || data?.id || (data?.user_id));
-        setAverageRating(avg?.average ?? 0);
-      } catch (e) {
-        setAverageRating(0);
-      }
-    } catch (err) {
-      console.error("Error cargando perfil:", err);
-    }
-    setLoading(false);
-  };
+        setLoading(true);
+        setError(null);
+        // Obtener perfil del usuario por ID
+        const profileData = await profileService.getProfileById(userId);
+        setProfile(profileData);
 
-useEffect(() => {
-  const loadProfile = async () => {
-    try {
-      const data = await profileService.getMyProfile();
-      setProfile(data);
-      setAvatarError(false);
-    } catch (err) {
-      console.error("Error cargando perfil:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  loadProfile();
-}, []);
-
-// Ensure average rating is also loaded when component mounts (for current user)
-useEffect(() => {
-  const loadAverage = async () => {
-    try {
-      const me = await profileService.getMyProfile();
-      const id = me?.user?.id || me?.id || me?.user_id;
-      if (id) {
+        // Si existe user en la respuesta, obtenerlo
+        if (profileData.user) {
+          setUser(profileData.user);
+        }
+        // Obtener promedio de ratings de todos sus posts
         try {
-          const avgRes = await profileService.getUserAverageRating(id);
+          const avgRes = await profileService.getUserAverageRating(userId);
           setAverageRating(avgRes?.average ?? 0);
-        } catch (e) {
-          console.warn('Error fetching average rating for current user', e);
+        } catch (err) {
+          console.warn('No se pudo obtener average rating del usuario', err);
           setAverageRating(0);
         }
-      } else {
-        setAverageRating(0);
+
+        setAvatarError(false);
+      } catch (err) {
+        console.error("Error cargando perfil del usuario:", err);
+        setError("No se pudo cargar el perfil del usuario");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.warn('Could not fetch /me for average rating', err);
-      setAverageRating(0);
+    };
+
+    if (userId) {
+      loadUserProfile();
     }
-  };
-
-  loadAverage();
-}, []);
-
+  }, [userId]);
 
   if (loading) {
     return (
@@ -82,7 +59,26 @@ useEffect(() => {
           color: "var(--text)",
         }}
       >
-        Cargando tu perfil…
+        Cargando perfil…
+      </div>
+    );
+  }
+
+  if (error || !profile || !user) {
+    return (
+      <div className="profile-container">
+        <div className="profile-card">
+          <p style={{ color: "var(--error)", textAlign: "center" }}>
+            {error || "Usuario no encontrado"}
+          </p>
+          <button
+            className="btn"
+            style={{ width: "100%", marginTop: "1rem" }}
+            onClick={() => navigate("/")}
+          >
+            Volver al inicio
+          </button>
+        </div>
       </div>
     );
   }
@@ -91,7 +87,7 @@ useEffect(() => {
     <div className="profile-container">
       {/* CARD PRINCIPAL */}
       <div className="profile-card">
-        {/* FOTO (placeholder si no hay user.img) */}
+        {/* FOTO */}
         <div className="profile-avatar">
           <div className="profile-avatar-circle">
             {(() => {
@@ -134,7 +130,7 @@ useEffect(() => {
 
         <p className="profile-username">@{user.username}</p>
 
-        {/* Average rating (confiabilidad) */}
+        {/* Average rating */}
         <div style={{ marginTop: '6px', marginBottom: '6px' }}>
           <strong>Confiabilidad:</strong>{' '}
           {averageRating === null ? (
@@ -151,10 +147,6 @@ useEffect(() => {
           <p>
             <strong>Email:</strong> {user.email}
           </p>
-          <p>
-            <strong>Rol:</strong>{" "}
-            {user.role === "admin" ? "Administrador" : "Usuario"}
-          </p>
 
           {profile?.location && (
             <p>
@@ -170,22 +162,14 @@ useEffect(() => {
           )}
         </div>
 
-        {/* ACCIONES */}
+        {/* ACCIONES (solo botón volver) */}
         <div className="profile-buttons">
           <button
             className="btn"
             style={{ width: "100%" }}
-            onClick={() => navigate("/edit-profile")}
+            onClick={() => navigate("/")}
           >
-            Editar perfil
-          </button>
-
-          <button
-            className="btn-outline"
-            onClick={logout}
-            style={{ width: "100%" }}
-          >
-            Cerrar sesión
+            Volver al inicio
           </button>
         </div>
       </div>
@@ -193,4 +177,4 @@ useEffect(() => {
   );
 };
 
-export default ProfilePage;
+export default UserProfilePage;

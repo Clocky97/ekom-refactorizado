@@ -13,9 +13,42 @@ export const createReport = async (req, res) => {
 
 export const getReports = async (req, res) => {
   try {
-    const reports = await Report.findAll();
+    const reports = await Report.findAll({
+      include: [
+        {
+          association: 'user',
+          attributes: ['id', 'username', 'email']
+        },
+        {
+          association: 'post',
+          attributes: ['id', 'title', 'content', 'image', 'user_id', 'createdAt'],
+          include: [
+            {
+              association: 'usuario',
+              attributes: ['id', 'username', 'email']
+            }
+          ]
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
     res.json(reports);
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener los reportes' });
+    console.error('Error en getReports:', error);
+    res.status(500).json({ error: 'Error al obtener los reportes', details: error.message });
+  }
+};
+
+export const deleteReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const report = await Report.findByPk(id);
+    if (!report) {
+      return res.status(404).json({ error: 'Reporte no encontrado' });
+    }
+    await report.destroy();
+    res.json({ message: 'Reporte eliminado exitosamente' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar el reporte' });
   }
 };
