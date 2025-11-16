@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { postsService } from "../api/posts.service";
 import { entitiesService } from "../api/entities.service";
 import PostCard from "../components/Posts/PostCard";
+import { postOffersService } from "../api/postOffers.service";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import "../index.css"
@@ -16,10 +17,23 @@ const HomePage = () => {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [marketFilter, setMarketFilter] = useState("");
   const [loading, setLoading] = useState(true);
+  const [featuredOffers, setFeaturedOffers] = useState([]);
 
   useEffect(() => {
     loadInitialData();
   }, []);
+
+  const handleSeedOffers = async () => {
+    try {
+      await postOffersService.seedOffers();
+      const fo = await postOffersService.getFeaturedOffers();
+      setFeaturedOffers(fo);
+      alert('Ofertas de prueba creadas. Recarga si no ves cambios.');
+    } catch (err) {
+      console.error(err);
+      alert('No se pudieron crear ofertas de prueba: ' + (err?.message || err));
+    }
+  };
 
   const loadInitialData = async () => {
     try {
@@ -27,11 +41,20 @@ const HomePage = () => {
         postsService.getAllPosts(),
         entitiesService.getAllCategories(),
         entitiesService.getAllMarkets(),
+        // featured offers fetch (non-blocking)
       ]);
 
       setPosts(p);
       setCategories(c);
       setMarkets(m);
+      // fetch featured offers separately
+      try {
+        const { postOffersService } = await import('../api/postOffers.service');
+        const fo = await postOffersService.getFeaturedOffers();
+        setFeaturedOffers(fo);
+      } catch (err) {
+        console.warn('No se pudieron cargar ofertas destacadas', err);
+      }
     } catch (err) {
       console.error("Error cargando datos:", err);
     }
@@ -64,6 +87,11 @@ const HomePage = () => {
           padding: "1rem 1.4rem",
         }}
       >
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+          <button className="btn-outline" onClick={handleSeedOffers} style={{ fontSize: 12 }}>
+            Dev: generar ofertas
+          </button>
+        </div>
         <input
           type="text"
           placeholder="Buscar publicaciones…"
@@ -130,7 +158,9 @@ const HomePage = () => {
       <div
         style={{
           margin: "0 auto",
-          maxWidth: "700px", // feed centrado tipo Facebook
+          maxWidth: "750px",
+          paddingLeft: featuredOffers.length > 0 ? "0" : "0",
+          transition: "paddingLeft 0.3s ease",
         }}
       >
         {loading ? (
@@ -159,6 +189,22 @@ const HomePage = () => {
           ))
         )}
       </div>
+
+      {/* SIDEBAR OFERTAS DESTACADAS (izquierda, solo en desktop) */}
+      {featuredOffers.length > 0 && (
+        <div className="featured-sidebar" style={{ position: 'fixed', left: 15, top: 120, width: 240, maxHeight: '70vh', overflowY: 'auto' }}>
+          <div className="card" style={{ padding: '1rem', marginBottom: 0 }}>
+            <h4 style={{ marginTop: 0, marginBottom: '0.8rem', fontSize: '1rem' }}>Ofertas</h4>
+            {featuredOffers.map((o) => (
+              <div key={o.id} style={{ padding: '0.4rem 0', borderBottom: '1px solid #eee', fontSize: '0.85rem' }}>
+                <div style={{ fontWeight: 600, color: 'var(--primary-dark)', fontSize: '0.8rem' }}>{o.user?.username || 'U.'}</div>
+                <div style={{ fontSize: '0.75rem', color: '#666', marginTop: '2px' }}>{o.post?.title?.substring(0, 20)}...</div>
+                <div style={{ color: 'var(--accent-300)', fontWeight: 700, fontSize: '0.9rem', marginTop: '2px' }}>${o.amount}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Botón Crear publicación */}
       {isAuthenticated && (

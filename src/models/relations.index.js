@@ -6,6 +6,8 @@ import { MarketModel } from "./market.model.js";
 import Report from "./report.model.js";
 import Rating from "./rating.model.js";
 import { OfferModel } from "./offer.model.js";
+import PostOffer from "./postOffer.model.js";
+import CartModel from "./cart.model.js";
 
 
 
@@ -42,6 +44,28 @@ PostModel.belongsTo(OfferModel, {
     foreignKey: "offer_id"
 })
 
+// post con postOffers (ofertas hechas por usuarios)
+PostModel.hasMany(PostOffer, {
+    as: "offers",
+    foreignKey: "post_id"
+});
+
+PostOffer.belongsTo(PostModel, {
+    as: "post",
+    foreignKey: "post_id"
+});
+
+// usuario con postOffers
+User.hasMany(PostOffer, {
+    as: "postOffers",
+    foreignKey: "user_id"
+});
+
+PostOffer.belongsTo(User, {
+    as: "user",
+    foreignKey: "user_id"
+});
+
 //post con category
 PostModel.belongsTo(CategoryModel, {
     as: "categoria",
@@ -68,6 +92,29 @@ Rating.belongsTo(User);
 // Un post puede tener muchas puntuaciones
 PostModel.hasMany(Rating);
 Rating.belongsTo(PostModel);
+
+// Un usuario puede tener muchos items en carrito
+User.hasMany(CartModel, {
+    as: "cartItems",
+    foreignKey: "user_id"
+});
+
+CartModel.belongsTo(User, {
+    as: "user",
+    foreignKey: "user_id"
+});
+
+// Un carrito pertenece a un post
+CartModel.belongsTo(PostModel, {
+    as: "post",
+    foreignKey: "post_id"
+});
+
+PostModel.hasMany(CartModel, {
+    as: "cartItems",
+    foreignKey: "post_id"
+});
+
 export { User, Profile };
 
 

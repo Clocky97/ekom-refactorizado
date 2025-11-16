@@ -24,6 +24,10 @@ export const PostModel = sequelize.define(
             type: DataTypes.INTEGER,
             allowNull: true
         },
+        custom_offer_percent: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
         "category_id": {
             type: DataTypes.INTEGER,
             allowNull: true

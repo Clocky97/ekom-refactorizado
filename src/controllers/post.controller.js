@@ -109,7 +109,7 @@ export const createPost = async (req, res) => {
         // Debug: show incoming authorization header to troubleshoot "Token requerido"
         console.log('createPost - Authorization header:', req.headers.authorization);
 
-        const { title, content, price, brand, market_id, category_id, offer_id } = req.body;
+        const { title, content, price, brand, market_id, category_id, offer_id, custom_offer_percent } = req.body;
         
         // Require an uploaded image
         if (!req.file) {
@@ -134,6 +134,7 @@ export const createPost = async (req, res) => {
             market_id,
             category_id,
             offer_id: offer_id || null,
+            custom_offer_percent: custom_offer_percent ? Number(custom_offer_percent) : null,
             image: imagePath,
             user_id: req.user.id
         });

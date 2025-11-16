@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { postsService } from "../../api/posts.service.js";
 import { entitiesService } from "../../api/entities.service.js";
-import { offersService } from "../../api/offers.service.js";
 
 const initialFormState = {
   title: "",
@@ -10,7 +9,6 @@ const initialFormState = {
   brand: "",
   market_id: "",
   category_id: "",
-  offer_id: "",
 };
 
 const PostForm = ({ postToEdit, onClose, onSave }) => {
@@ -20,7 +18,7 @@ const PostForm = ({ postToEdit, onClose, onSave }) => {
   const [loadingEntities, setLoadingEntities] = useState(true);
   const [markets, setMarkets] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [offers, setOffers] = useState([]);
+  
 
   const [imageFile, setImageFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -31,15 +29,13 @@ const PostForm = ({ postToEdit, onClose, onSave }) => {
   useEffect(() => {
     const fetchEntities = async () => {
       try {
-        const [marketData, categoryData, offerData] = await Promise.all([
+        const [marketData, categoryData] = await Promise.all([
           entitiesService.getAllMarkets(),
           entitiesService.getAllCategories(),
-          offersService.getAllOffers(),
         ]);
 
         setMarkets(marketData);
         setCategories(categoryData);
-        setOffers(offerData);
 
         if (postToEdit) {
           setFormData({
@@ -49,7 +45,6 @@ const PostForm = ({ postToEdit, onClose, onSave }) => {
             brand: postToEdit.brand || "",
             market_id: postToEdit.market_id,
             category_id: postToEdit.category_id,
-            offer_id: postToEdit.offer_id || "",
           });
         } else {
           setFormData((prev) => ({
@@ -116,8 +111,6 @@ const PostForm = ({ postToEdit, onClose, onSave }) => {
         fd.append("brand", formData.brand);
         fd.append("market_id", Number(formData.market_id));
         fd.append("category_id", Number(formData.category_id));
-
-        if (formData.offer_id) fd.append("offer_id", formData.offer_id);
         fd.append("image", imageFile);
 
         res = await postsService.createPost(fd);
@@ -232,21 +225,9 @@ const PostForm = ({ postToEdit, onClose, onSave }) => {
         </div>
 
         {/* OFERTA */}
-        <div className="postform-group">
-          <label>Oferta (opcional)</label>
-          <select
-            name="offer_id"
-            value={formData.offer_id}
-            onChange={handleChange}
-          >
-            <option value="">Sin oferta</option>
-            {offers.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/* Oferta opcional removida: ahora las ofertas se aplican solo desde el dueño del post */}
+
+        {/* Oferta personalizada removida de creación/edición de posts. Las ofertas se aplican desde la publicación por su dueño. */}
 
         {/* IMAGEN */}
         {!postToEdit && (

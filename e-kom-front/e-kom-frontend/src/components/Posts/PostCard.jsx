@@ -3,9 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { postsService } from '../../api/posts.service.js';
+import { postOffersService } from '../../api/postOffers.service.js';
 import { entitiesService } from '../../api/entities.service.js';
 import api from '../../api/api.js';
 import { useCart } from '../../context/CartContext.jsx';
+import MapModal from '../Common/MapModal.jsx';
 
 const PostCard = ({ post, onDelete, onUpdate }) => {
   const { isAuthenticated, user } = useAuth();
@@ -15,6 +17,10 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
   const [averageRating, setAverageRating] = useState(0);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [selectedRating, setSelectedRating] = useState(0);
+  const [showOfferModal, setShowOfferModal] = useState(false);
+  const [offerPercent, setOfferPercent] = useState('');
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [marketData, setMarketData] = useState(null);
 
   useEffect(() => {
     const fetchRating = async () => {
@@ -27,6 +33,8 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
     };
     fetchRating();
   }, [post.id]);
+
+  // Owner-only flow: owner applies percent discounts via modal
 
   useEffect(() => {
     const resolveMarketName = async () => {
@@ -42,6 +50,27 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
     };
     resolveMarketName();
   }, [post]);
+
+  const handleOpenMarketMap = async () => {
+    if (!post.market_id) {
+      alert('No hay mercado asociado a esta publicación');
+      return;
+    }
+
+    try {
+      const markets = await entitiesService.getAllMarkets();
+      const found = markets.find(m => String(m.id) === String(post.market_id));
+      if (found) {
+        setMarketData(found);
+        setShowMapModal(true);
+      } else {
+        alert('No se pudo encontrar la información del mercado');
+      }
+    } catch (err) {
+      console.error('Error fetching market data:', err);
+      alert('Error al cargar datos del mercado');
+    }
+  };
 
   const handleRate = async (score) => {
     if (!isAuthenticated) return alert("Debes iniciar sesión para calificar.");
@@ -111,12 +140,12 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
       )}
 
       {/* Encabezado */}
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
         <div>
-          <h3 style={{ fontSize: "1.3rem", fontWeight: 700, color: "var(--primary-dark)", margin: 0 }}>
+          <h3 style={{ fontSize: "1.3rem", fontWeight: 700, color: "var(--primary-dark)", margin: "0 0 0.4rem 0", lineHeight: 1.3 }}>
             {post.title}
           </h3>
-          <p style={{ fontSize: "0.8rem", color: "var(--primary)" }}>
+          <p style={{ fontSize: "0.85rem", color: "var(--primary)", margin: "0.3rem 0 0 0", lineHeight: 1.4 }}>
             Por{" "}
             <button
               onClick={() => navigate(`/user/${post.user_id}`)}
@@ -143,30 +172,51 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
         <button
           onClick={handleToggleSave}
           className="btn-outline"
-          style={{ padding: "0.3rem 0.6rem" }}
+          style={{ padding: "0.3rem 0.6rem", height: "fit-content" }}
         >
           {saved ? "✓ Guardado" : "Guardar"}
         </button>
       </div>
 
       {/* Descripción */}
-      <p style={{ marginTop: "0.6rem", lineHeight: 1.5, color: "var(--text)" }}>
+      <p style={{ marginTop: "1.2rem", marginBottom: "1.2rem", lineHeight: 1.7, color: "var(--text)", fontSize: "1rem" }}>
         {post.content}
       </p>
 
       {/* Info básica */}
-      <div style={{ marginTop: "1rem" }}>
-        <p><strong>Precio:</strong> ${post.price}</p>
-        <p><strong>Marca:</strong> {post.brand}</p>
-        <p><strong>Local:</strong> {post.market_name || "Desconocido"}</p>
-        <p><strong>Categoría:</strong> {post.category_name}</p>
+      <div style={{ marginTop: "1.5rem", marginBottom: "1rem" }}>
+        <p style={{ marginBottom: "0.8rem" }}><strong>Precio:</strong> ${post.price}</p>
+        <p style={{ marginBottom: "0.8rem" }}><strong>Marca:</strong> {post.brand}</p>
+        <p style={{ marginBottom: "0.8rem" }}>
+          <strong>Local:</strong>{" "}
+          <button
+            onClick={handleOpenMarketMap}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--primary-dark)",
+              fontWeight: "600",
+              cursor: "pointer",
+              textDecoration: "underline",
+              padding: 0,
+            }}
+            onMouseEnter={(e) => (e.target.style.opacity = "0.8")}
+            onMouseLeave={(e) => (e.target.style.opacity = "1")}
+          >
+            {post.market_name || "Desconocido"} 📍
+          </button>
+        </p>
+        <p style={{ marginBottom: "0.8rem" }}><strong>Categoría:</strong> {post.category_name}</p>
         {post.offer_name && (
-          <span className="offer-tag">🎁 {post.offer_name}</span>
+          <span className="offer-tag" style={{ marginRight: "0.5rem" }}>🎁 {post.offer_name}</span>
+        )}
+        {post.custom_offer_percent && (
+          <span className="offer-tag">🎯 {post.custom_offer_percent}%</span>
         )}
       </div>
 
       {/* Rating */}
-      <div style={{ marginTop: "1rem", fontWeight: 600, color: "var(--text)" }}>
+      <div style={{ marginTop: "1.5rem", marginBottom: "1.5rem", fontWeight: 600, color: "var(--text)", fontSize: "1.1rem" }}>
         ⭐ {averageRating.toFixed(2)}
       </div>
 
@@ -191,6 +241,65 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
           </button>
         </div>
       )}
+
+      {/* Owner actions: allow applying percent discount */}
+      {isOwner && (
+        <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem", flexWrap: "wrap" }}>
+          <button className="btn" style={{ background: "#2a9d8f" }} onClick={() => setShowOfferModal(true)}>
+            Añadir oferta (descuento %)
+          </button>
+          {post.custom_offer_percent && (
+            <button className="btn" style={{ background: "#d9534f" }} onClick={async () => {
+              if (!window.confirm('¿Seguro que deseas quitar el descuento?')) return;
+              try {
+                await postOffersService.removeOwnerOffer(post.id);
+                alert('Descuento removido correctamente. La página se recargará.');
+                window.location.reload();
+              } catch (err) {
+                alert(err.response?.data?.error || 'Error al remover descuento');
+              }
+            }}>
+              Quitar oferta
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* MODAL DE OWNER OFFER (apply percent discount) */}
+      <AnimatePresence>
+        {showOfferModal && (
+          <motion.div className="modal-backdrop">
+            <motion.div className="modal">
+              <h4 className="text-lg font-semibold mb-3">Aplicar descuento en esta publicación</h4>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <label>Descuento (%) (1-100):</label>
+                <input type="number" value={offerPercent} onChange={(e) => setOfferPercent(e.target.value)} style={{ width: '100%', padding: '0.5rem', marginTop: '0.3rem' }} min={1} max={100} />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <button className="btn-outline" onClick={() => { setShowOfferModal(false); setOfferPercent(''); }}>
+                  Cancelar
+                </button>
+
+                <button className="btn" onClick={async () => {
+                  const p = Number(offerPercent);
+                  if (!p || p < 1 || p > 100) return alert('Ingresa un porcentaje válido entre 1 y 100');
+                  try {
+                    await postOffersService.applyOwnerOffer(post.id, p);
+                    alert('Descuento aplicado correctamente. La página se recargará para mostrar cambios.');
+                    window.location.reload();
+                  } catch (err) {
+                    alert(err.response?.data?.error || 'Error al aplicar descuento');
+                  }
+                }}>
+                  Aplicar descuento
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* MODAL DE RATING */}
       <AnimatePresence>
@@ -230,6 +339,14 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* MAP MODAL */}
+      <MapModal
+        isOpen={showMapModal}
+        marketName={marketData?.name || ''}
+        marketLocation={marketData?.location || ''}
+        onClose={() => setShowMapModal(false)}
+      />
     </motion.div>
   );
 };
