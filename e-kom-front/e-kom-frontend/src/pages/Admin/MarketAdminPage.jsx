@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { entitiesService } from '../../api/entities.service.js';
 import MarketForm from '../../components/admin/MarketForm.jsx';
+import '../../components/admin/AdminStyles.css';
 
 const MarketAdminPage = () => {
   const [markets, setMarkets] = useState([]);
@@ -12,7 +13,7 @@ const MarketAdminPage = () => {
       const data = await entitiesService.getAllMarkets();
       setMarkets(data);
     } catch (error) {
-      console.error("Error al cargar mercados:", error);
+      console.error("Error al cargar comercios:", error);
     } finally {
       setLoading(false);
     }
@@ -23,37 +24,48 @@ const MarketAdminPage = () => {
   }, [fetchMarkets]);
 
   const handleDelete = async (marketId) => {
-    if (!window.confirm(`¿Estás seguro de eliminar el comercio ID ${marketId}?`)) return;
+    if (!window.confirm(`¿Eliminar el comercio ID ${marketId}?`)) return;
+
     try {
       await entitiesService.deleteMarket(marketId);
-      fetchMarkets(); 
+      fetchMarkets();
     } catch (error) {
-      alert(error.response?.data?.msj || "Error al eliminar. Revisa si tienes permisos de admin.");
+      alert(error.response?.data?.msj || "Error al eliminar el comercio.");
     }
   };
 
   if (loading) {
-    return <div>Cargando comercios...</div>;
+    return <div className="adm-loading">Cargando comercios...</div>;
   }
 
   return (
-    <div>
-      <h2>Administración de Locales/Comercios (Solo Admin)</h2>
-      
+    <div className="adm-container">
+      <h2 className="adm-page-title">Administración de Locales / Comercios</h2>
+
       <MarketForm onSave={fetchMarkets} />
 
-      <h4>Lista de Comercios</h4>
-      <ul style={{ listStyleType: 'none', padding: 0 }}>
+      <h3 className="adm-subtitle">Lista de Comercios</h3>
+
+      <ul className="adm-list">
         {markets.map(m => (
-          <li key={m.id} style={{ padding: '5px', borderBottom: '1px dotted #ccc' }}>
+          <li key={m.id} className="adm-list-item">
             <span>
-                ID {m.id}: **{m.name}** ({m.type}) en {m.location}
+              <strong>ID {m.id}</strong>: {m.name} ({m.type}) – {m.location}
             </span>
-            <button onClick={() => handleDelete(m.id)} style={{ color: 'red', marginLeft: '10px' }}>Eliminar</button>
+
+            <button
+              className="adm-btn-delete"
+              onClick={() => handleDelete(m.id)}
+            >
+              Eliminar
+            </button>
           </li>
         ))}
       </ul>
-      {markets.length === 0 && <p>No hay comercios registrados.</p>}
+
+      {markets.length === 0 && (
+        <p className="adm-empty">No hay comercios registrados.</p>
+      )}
     </div>
   );
 };

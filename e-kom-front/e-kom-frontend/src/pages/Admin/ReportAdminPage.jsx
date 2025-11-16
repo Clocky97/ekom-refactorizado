@@ -3,6 +3,9 @@ import { getReports, deleteReport } from '../../api/reports.service.js';
 import { useToast } from '../../context/ToastContext';
 import ConfirmModal from '../../components/Common/ConfirmModal';
 
+// IMPORTANTE → estilo unificado de admin
+import '../../components/admin/AdminStyles.css';
+
 const ReportAdminPage = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,34 +47,36 @@ const ReportAdminPage = () => {
   };
 
   if (loading) {
-    return <div className="text-center p-4">Cargando...</div>;
+    return <div className="admin-loading">Cargando reportes...</div>;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Reportes de la plataforma</h1>
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+    <div className="admin-container">
+      <h1 className="admin-title">📢 Gestión de Reportes</h1>
+
+      <div className="admin-card">
+        <table className="admin-table">
+          <thead>
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motivo</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+              <th>ID</th>
+              <th>Usuario</th>
+              <th>Motivo</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+
+          <tbody>
             {reports.map((report) => (
               <tr key={report.id}>
-                <td className="px-6 py-4 whitespace-nowrap">{report.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{report.user?.username || 'Desconocido'}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{report.reason}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{new Date(report.createdAt).toLocaleString()}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td>{report.id}</td>
+                <td>{report.user?.username || 'Desconocido'}</td>
+                <td>{report.reason}</td>
+                <td>{new Date(report.createdAt).toLocaleString()}</td>
+                <td>
                   <button
                     onClick={() => handleDeleteClick(report)}
-                    className="text-red-600 hover:text-red-900"
+                    className="admin-btn-danger"
                   >
                     Eliminar
                   </button>
@@ -80,13 +85,18 @@ const ReportAdminPage = () => {
             ))}
           </tbody>
         </table>
+
+        {reports.length === 0 && (
+          <p className="admin-empty">No hay reportes registrados.</p>
+        )}
       </div>
+
       <ConfirmModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDeleteConfirm}
         title="Eliminar Reporte"
-        message={`¿Estás seguro de que deseas eliminar el reporte #${selectedReport?.id}?`}
+        message={`¿Estás seguro de eliminar el reporte #${selectedReport?.id}?`}
       />
     </div>
   );

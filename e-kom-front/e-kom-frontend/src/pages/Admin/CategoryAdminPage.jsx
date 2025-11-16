@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { entitiesService } from '../../api/entities.service.js';
 import CategoryForm from '../../components/admin/CategoryForm.jsx';
+import '../../components/admin/AdminStyles.css'; 
 
 const CategoryAdminPage = () => {
   const [categories, setCategories] = useState([]);
@@ -24,34 +25,48 @@ const CategoryAdminPage = () => {
 
   const handleDelete = async (categoryId) => {
     if (!window.confirm(`¿Estás seguro de eliminar la categoría ID ${categoryId}?`)) return;
+
     try {
       await entitiesService.deleteCategory(categoryId);
-      fetchCategories(); 
+      fetchCategories();
     } catch (error) {
-      alert(error.response?.data?.msj || "Error al eliminar. Revisa si tienes permisos de admin.");
+      alert(error.response?.data?.msj || "Error al eliminar. Revisa permisos.");
     }
   };
 
   if (loading) {
-    return <div>Cargando categorías...</div>;
+    return <div className="adm-loading">Cargando categorías...</div>;
   }
 
   return (
-    <div>
-      <h2>Administración de Categorías (Solo Admin)</h2>
-      
+    <div className="adm-page">
+
+      <h2 className="adm-title">Administración de Categorías</h2>
+
+      {/* Formulario */}
       <CategoryForm onSave={fetchCategories} />
 
-      <h4>Lista de Categorías</h4>
-      <ul style={{ listStyleType: 'none', padding: 0 }}>
+      <h4 className="adm-subtitle">Lista de Categorías</h4>
+
+      {categories.length === 0 && (
+        <p className="adm-empty">No hay categorías.</p>
+      )}
+
+      <ul className="adm-list">
         {categories.map(cat => (
-          <li key={cat.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px', borderBottom: '1px dotted #ccc' }}>
+          <li key={cat.id} className="adm-list-item">
             <span>ID {cat.id}: {cat.name}</span>
-            <button onClick={() => handleDelete(cat.id)} style={{ color: 'red' }}>Eliminar</button>
+
+            <button
+              onClick={() => handleDelete(cat.id)}
+              className="adm-delete-btn"
+            >
+              Eliminar
+            </button>
           </li>
         ))}
       </ul>
-      {categories.length === 0 && <p>No hay categorías.</p>}
+
     </div>
   );
 };

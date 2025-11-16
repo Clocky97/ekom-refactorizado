@@ -1,48 +1,77 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useState } from "react";
 
-const CartContext = createContext(null);
-
-export const useCart = () => useContext(CartContext);
-
-const LOCAL_KEY = 'ekom_cart_v1';
+const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [items, setItems] = useState([]);
-  const [open, setOpen] = useState(false);
+  const [cart, setCart] = useState([]);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LOCAL_KEY);
-      if (raw) setItems(JSON.parse(raw));
-    } catch (e) { /* ignore */ }
-  }, []);
-
-  useEffect(() => {
-    try { localStorage.setItem(LOCAL_KEY, JSON.stringify(items)); } catch (e) {}
-  }, [items]);
-
-  const add = useCallback((post) => {
-    setItems(prev => {
-      if (prev.find(p => p.id === post.id)) return prev;
-      return [...prev, post];
+  const addToCart = (post) => {
+    setCart((current) => {
+      const exists = current.find((item) => item.id === post.id);
+      if (exists) {
+        return current.map((item) =>
+          item.id === post.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+      return [...current, { ...post, quantity: 1 }];
     });
-  }, []);
+  };
 
-  const remove = useCallback((postId) => {
-    setItems(prev => prev.filter(p => p.id !== postId));
-  }, []);
+  const increase = (id) => {
+    setCart((current) =>
+      current.map((item) =>
+        item.id === id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      )
+    );
+  };
 
-  const clear = useCallback(() => setItems([]), []);
+  const decrease = (id) => {
+    setCart((current) =>
+      current
+        .map((item) =>
+          item.id === id
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  };
 
-  const isInCart = useCallback((postId) => items.some(p => p.id === postId), [items]);
+  const removeFromCart = (id) => {
+    setCart((current) => current.filter((item) => item.id !== id));
+  };
 
-  const total = items.reduce((s, p) => s + (Number(p.price) || 0), 0);
+  const clearCart = () => setCart([]);
+
+  const cartTotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  const isInCart = (id) => {
+    return cart.some((item) => item.id === id);
+  };
 
   return (
-    <CartContext.Provider value={{ items, add, remove, clear, isInCart, total, open, setOpen }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        addToCart,
+        increase,
+        decrease,
+        removeFromCart,
+        clearCart,
+        cartTotal,
+        isInCart,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
 
-export default CartContext;
+export const useCart = () => useContext(CartContext);

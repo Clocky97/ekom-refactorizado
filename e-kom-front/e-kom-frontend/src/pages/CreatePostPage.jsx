@@ -6,12 +6,10 @@ const CreatePostPage = () => {
   const navigate = useNavigate();
 
   const handleSuccess = () => {
-    // After successful creation, redirect to home
     navigate('/');
   };
 
   const handleClose = () => {
-    // If user cancels, go back to home
     navigate('/');
   };
 

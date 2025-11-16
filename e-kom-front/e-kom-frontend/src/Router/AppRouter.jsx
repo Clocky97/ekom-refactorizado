@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import Header from '../components/Common/Header.jsx';
 
@@ -10,6 +10,7 @@ import ProfilePage from '../pages/ProfilePage.jsx';
 import HomePage from '../pages/HomePage.jsx';
 import CreatePostPage from '../pages/CreatePostPage.jsx';
 import CartPage from '../pages/CartPage.jsx';
+import EditProfilePage from "../pages/EditProfilePage.jsx"; 
 
 // Admin pages
 import CategoryAdminPage from '../pages/admin/CategoryAdminPage.jsx';
@@ -50,23 +51,37 @@ const ProtectedRoute = ({ element }) => {
 const AdminLayout = () => {
   return (
     <div className="admin-layout">
-      <div className="admin-content">
-        <aside className="sidebar">
-          <h2>Panel de Administración</h2>
-          <nav>
-            <a href="/admin/categories">Categorías</a>
-            <a href="/admin/markets">Locales/Comercios</a>
-            <a href="/admin/products">Productos</a>
-            <div className="report-section">
-              <ReportNotificationModal />
-              <span>Reportes</span>
-            </div>
-          </nav>
-        </aside>
-        <main className="main-content">
-          <Outlet />
-        </main>
+      <div className="admin-sidebar">
+
+        <h2 className="admin-title">Panel de Administración</h2>
+
+        <nav className="admin-nav">
+
+          <Link to="/admin/categories" className="admin-link">
+            Categorías
+          </Link>
+
+          <Link to="/admin/markets" className="admin-link">
+            Locales / Comercios
+          </Link>
+
+          {/* Producto (pronto deprecado, pero lo dejo con estilo) */}
+          <Link to="/admin/products" className="admin-link">
+            Productos
+          </Link>
+
+          {/* Reportes con campana */}
+          <div className="admin-reports">
+            <ReportNotificationModal />
+            <span className="admin-link">Reportes</span>
+          </div>
+
+        </nav>
       </div>
+
+      <main className="admin-main">
+        <Outlet />
+      </main>
     </div>
   );
 };
@@ -81,8 +96,20 @@ const AppRouter = () => {
   <Route path="/cart" element={<CartPage />} />
 
       {/* Rutas protegidas */}
-      <Route path="/profile" element={<ProtectedRoute element={<ProfilePage />} />} />
-      <Route path="/create-post" element={<ProtectedRoute element={<CreatePostPage />} />} />
+<Route 
+  path="/profile" 
+  element={<ProtectedRoute element={<ProfilePage />} />} 
+/>
+
+<Route 
+  path="/edit-profile" 
+  element={<ProtectedRoute element={<EditProfilePage />} />} 
+/>
+
+<Route 
+  path="/create-post" 
+  element={<ProtectedRoute element={<CreatePostPage />} />} 
+/>
 
       {/* Panel de administrador */}
       <Route path="/admin" element={<AdminRoute element={<AdminLayout />} />}>

@@ -82,7 +82,15 @@ export const getCurrentUser = async (req, res) => {
             include: [{ model: Profile, as: 'profile' }]
         });
         if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
-        res.json(user);
+        
+        // Normalize avatar URL if it's a relative path
+        const obj = user.toJSON();
+        const host = `${req.protocol}://${req.get('host')}`;
+        if (obj.profile && obj.profile.avatar && obj.profile.avatar.startsWith('/uploads')) {
+            obj.profile.avatar = `${host}${obj.profile.avatar}`;
+        }
+        
+        res.json(obj);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener usuario actual: ' + error.message });
     }

@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { entitiesService } from '../../api/entities.service';
+import './AdminStyles.css'; // RECOMENDADO: centralizamos el estilo marrón
 
 const MarketForm = ({ onSave }) => {
   const [formData, setFormData] = useState({
     name: '',
     location: '',
-    type: 'SuperMercado', 
+    type: 'SuperMercado',
   });
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const MARKET_TYPES = ["SuperMercado", "miniMercado", "kiosco"]; 
+  const MARKET_TYPES = ["SuperMercado", "miniMercado", "kiosco"];
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,10 +26,12 @@ const MarketForm = ({ onSave }) => {
     try {
       await entitiesService.createMarket(formData);
       setFormData({ name: '', location: '', type: 'SuperMercado' });
-      onSave(); 
+      onSave();
     } catch (err) {
-      console.error("Error al crear mercado:", err.response?.data);
-      const errorMsg = err.response?.data?.message || err.response?.data?.error || 'Error al crear el comercio.';
+      const errorMsg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Error al crear el comercio.';
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -35,19 +39,49 @@ const MarketForm = ({ onSave }) => {
   };
 
   return (
-    <div style={{ padding: '15px', border: '1px solid orange', marginBottom: '20px' }}>
-      <h4>Crear Nuevo Local/Comercio</h4>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <input type="text" name="name" placeholder="Nombre del Local" value={formData.name} onChange={handleChange} required /><br />
-        <input type="text" name="location" placeholder="Dirección/Ubicación" value={formData.location} onChange={handleChange} required /><br />
-        <select name="type" value={formData.type} onChange={handleChange} required>
-          {MARKET_TYPES.map(type => (
-            <option key={type} value={type}>{type}</option>
+    <div className="adm-card">
+      <h3 className="adm-title">Crear Nuevo Local / Comercio</h3>
+
+      {error && <p className="adm-error">{error}</p>}
+
+      <form className="adm-form" onSubmit={handleSubmit}>
+        <label className="adm-label">Nombre</label>
+        <input
+          className="adm-input"
+          type="text"
+          name="name"
+          placeholder="Nombre del local"
+          value={formData.name}
+          onChange={handleChange}
+          required
+        />
+
+        <label className="adm-label">Ubicación</label>
+        <input
+          className="adm-input"
+          type="text"
+          name="location"
+          placeholder="Dirección / Ubicación"
+          value={formData.location}
+          onChange={handleChange}
+          required
+        />
+
+        <label className="adm-label">Tipo de Comercio</label>
+        <select
+          name="type"
+          className="adm-input"
+          value={formData.type}
+          onChange={handleChange}
+          required
+        >
+          {MARKET_TYPES.map((t) => (
+            <option key={t} value={t}>{t}</option>
           ))}
-        </select><br />
-        <button type="submit" disabled={loading} style={{ marginTop: '10px' }}>
-          {loading ? 'Creando...' : 'Guardar Comercio'}
+        </select>
+
+        <button className="adm-btn" type="submit" disabled={loading}>
+          {loading ? "Creando..." : "Guardar Comercio"}
         </button>
       </form>
     </div>

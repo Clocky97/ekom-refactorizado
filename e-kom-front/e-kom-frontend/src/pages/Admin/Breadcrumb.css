@@ -1,0 +1,26 @@
+.breadcrumb {
+  display: flex;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  color: var(--primary-dark);
+  align-items: center;
+}
+
+.breadcrumb a {
+  color: var(--primary-dark);
+  text-decoration: none;
+  transition: color 0.18s, background 0.18s;
+  padding: 0.15rem 0.4rem;
+  border-radius: 8px;
+}
+
+.breadcrumb a:hover {
+  color: var(--primary-dark);
+  background: var(--accent-100);
+}
+
+.breadcrumb span {
+  opacity: 0.8;
+}

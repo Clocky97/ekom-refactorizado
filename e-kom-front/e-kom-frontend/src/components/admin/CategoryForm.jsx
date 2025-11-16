@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { entitiesService } from '../../api/entities.service';
+import './AdminStyles.css'; // NUEVO CSS EXCLUSIVO DEL PANEL ADMIN
 
 const CategoryForm = ({ onSave }) => {
   const [name, setName] = useState('');
@@ -25,18 +26,22 @@ const CategoryForm = ({ onSave }) => {
   };
 
   return (
-    <div style={{ padding: '15px', border: '1px solid green', marginBottom: '20px' }}>
-      <h4>Crear Nueva Categoría</h4>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
+    <div className="adm-card">
+      <h4 className="adm-title-sm">Crear Nueva Categoría</h4>
+
+      {error && <p className="adm-error">{error}</p>}
+
+      <form onSubmit={handleSubmit} className="adm-form">
         <input 
-          type="text" 
-          placeholder="Nombre de la categoría" 
-          value={name} 
-          onChange={(e) => setName(e.target.value)} 
-          required 
+          type="text"
+          className="adm-input"
+          placeholder="Nombre de la categoría"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
         />
-        <button type="submit" disabled={loading} style={{ marginLeft: '10px' }}>
+
+        <button type="submit" disabled={loading} className="adm-btn">
           {loading ? 'Creando...' : 'Guardar'}
         </button>
       </form>
