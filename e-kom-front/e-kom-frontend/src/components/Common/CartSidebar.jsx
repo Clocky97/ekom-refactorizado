@@ -47,14 +47,14 @@ export default function CartSidebar({ open, onClose }) {
       {/* Sidebar */}
       <div className={`cart-sidebar ${open ? "open" : ""}`}>
         <div className="cart-header">
-          <h2>Guardados 🛒</h2>
+          <h2>Carrito 🛒</h2>
           <button className="close-btn" onClick={onClose}>✕</button>
         </div>
 
         {/* Lista de productos */}
         <div className="cart-items">
           {cart.length === 0 ? (
-            <p className="empty">No hay productos guardados.</p>
+            <p className="empty">No hay productos en el carrito.</p>
           ) : (
             cart.map((item) => (
               <div key={item.id} className="cart-item">

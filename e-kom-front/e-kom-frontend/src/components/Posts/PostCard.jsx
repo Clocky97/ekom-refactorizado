@@ -174,7 +174,7 @@ const PostCard = ({ post, onDelete, onUpdate }) => {
           className="btn-outline"
           style={{ padding: "0.3rem 0.6rem", height: "fit-content" }}
         >
-          {saved ? "✓ Guardado" : "Guardar"}
+          {saved ? "✓ En carrito" : "Añadir al Carro"}
         </button>
       </div>
 

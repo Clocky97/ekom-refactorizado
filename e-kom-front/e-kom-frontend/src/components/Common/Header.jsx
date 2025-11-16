@@ -28,7 +28,7 @@ export default function Header() {
 
         {/* Carrito */}
         <button className="btn" onClick={() => setCartOpen(true)}>
-          Guardados ({cart.length})
+          Carrito ({cart.length})
         </button>
 
         {/* Panel admin */}
