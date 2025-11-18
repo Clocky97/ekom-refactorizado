@@ -1,5 +1,5 @@
 /* ================================
-   🎨 PALETA GLOBAL (marrón premium)
+   🎨 PALETA GLOBAL (Marroncito Pastel)
 ================================ */
 /* Fuente global */
 
@@ -10,35 +10,34 @@
   box-sizing: border-box;
 }
 
-
 :root {
-  --brand-50:  #f8f9fa;
-  --brand-100: #f1f3f6;
-  --brand-200: #e3e7ed;
-  --brand-300: #cfd8e3;
-  --brand-400: #b6c2d9;
-  --brand-500: #6c7a89;
-  --brand-600: #495867;
-  --brand-700: #33404f;
-  --brand-800: #212a36;
-  --brand-900: #14181c;
+  --brand-50:  #fbf6f1; /* muy claro */
+  --brand-100: #f7efe6;
+  --brand-200: #f0e3d3;
+  --brand-300: #e6d2bb;
+  --brand-400: #d6bda0;
+  --brand-500: #caa883;
+  --brand-600: #b28a64;
+  --brand-700: #8f6546;
+  --brand-800: #6b4a33;
+  --brand-900: #3c2e2a;
 
-  --accent-100: #eaf6f6;
-  --accent-200: #b8e0e6;
-  --accent-300: #5fb3b3;
+  --accent-100: #fff9f5;
+  --accent-200: #fff2e8;
+  --accent-300: #f7e3cf;
 
-  --primary: #5fb3b3;
-  --primary-dark: #357a7a;
-  --secondary: #b6c2d9;
-  --error: #e57373;
-  --success: #81c784;
+  --primary: #caa883;      /* pastel brown */
+  --primary-dark: #b28a64;
+  --secondary: #d6c3a8;
+  --error: #b24b3b;
+  --success: #6b8f6b;
 
-  --text: var(--primary-dark);
+  --text: var(--brand-900);
   --bg:   var(--brand-50);
 
-  --shadow-soft: 0 4px 16px rgba(44, 62, 80, 0.08);
-  --shadow-card: 0 8px 32px rgba(44, 62, 80, 0.12);
-  --shadow-hover: 0 12px 32px rgba(44, 62, 80, 0.18);
+  --shadow-soft: 0 4px 16px rgba(60, 46, 42, 0.06);
+  --shadow-card: 0 8px 32px rgba(60, 46, 42, 0.10);
+  --shadow-hover: 0 12px 32px rgba(60, 46, 42, 0.14);
 }
 
 /* ================================
@@ -64,7 +63,7 @@ html, body {
   max-width: 900px;
   margin: auto;
   padding: 2rem 1.5rem;
-  background: rgba(255,255,255,0.85);
+  background: rgba(255,250,245,0.92);
   border-radius: 18px;
   box-shadow: var(--shadow-card);
 }
@@ -707,5 +706,32 @@ textarea {
   main {
     padding: 1rem 0.5rem;
   }
+}
+
+/* ================================
+   🎫 Toast overrides (react-hot-toast)
+================================ */
+.react-hot-toast {
+  background: rgba(255,250,245,0.98) !important;
+  color: var(--text) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-card) !important;
+  border: 1px solid rgba(138,96,66,0.06) !important;
+}
+.react-hot-toast .toast-wrapper {
+  color: inherit;
+}
+.react-hot-toast.success {
+  background: #f3fbf3 !important;
+  color: #163725 !important;
+}
+.react-hot-toast.error {
+  background: #fff6f5 !important;
+  color: var(--error) !important;
+}
+
+/* increase specificity for inline-styled toasts */
+.toast, .rt-toast {
+  background: rgba(255,250,245,0.98) !important;
 }
 
