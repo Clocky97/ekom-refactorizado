@@ -4,6 +4,13 @@ import { MarketModel } from "../models/market.model.js";
 import { CategoryModel } from "../models/category.model.js";
 import { OfferModel } from "../models/offer.model.js";
 import DeletionLog from "../models/deletion.model.js";
+import Report from "../models/report.model.js";
+import Rating from "../models/rating.model.js";
+import PostOffer from "../models/postOffer.model.js";
+import CartModel from "../models/cart.model.js";
+import fs from 'fs';
+import path from 'path';
+import { sequelize } from "../config/database.js";
 
 export const getAllPost = async (req, res) => {
     try {
@@ -184,21 +191,53 @@ export const deletePost = async (req, res) => {
             return res.status(403).json({ message: 'No tienes permiso para eliminar esta publicación' });
         }
 
-                await post.destroy();
+                const postId = post.id;
 
+                console.log(`deletePost: starting deletion for post ${postId} by user ${requester.id}`);
+
+                // Run deletion in a transaction so it's atomic
+                const t = await sequelize.transaction();
                 try {
-                    // record deletion audit
+                    // Delete related records
+                    await CartModel.destroy({ where: { post_id: postId }, transaction: t });
+                    await PostOffer.destroy({ where: { post_id: postId }, transaction: t });
+                    // Reports and ratings might use different field names depending on migrations
+                    await Report.destroy({ where: { post_id: postId }, transaction: t });
+                    await Report.destroy({ where: { postId: postId }, transaction: t });
+                    await Rating.destroy({ where: { post_id: postId }, transaction: t });
+                    await Rating.destroy({ where: { postId: postId }, transaction: t });
+
+                    // Remove image file from uploads folder if exists
+                    if (post.image) {
+                        try {
+                            const filename = path.basename(post.image);
+                            const uploadsDir = path.resolve(process.cwd(), 'uploads');
+                            const filePath = path.join(uploadsDir, filename);
+                            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+                        } catch (e) {
+                            console.error('Error removing image file for post (will continue):', e);
+                        }
+                    }
+
+                    // Destroy post row (force to bypass paranoid soft-delete if enabled)
+                    await PostModel.destroy({ where: { id: postId }, force: true, transaction: t });
+
+                    // Record deletion audit
                     await DeletionLog.create({
-                        post_id: post.id,
+                        post_id: postId,
                         deleted_by: requester.id,
                         deleted_by_username: requester.username || requester.name || null,
                         deleted_at: new Date()
-                    });
-                } catch (e) {
-                    console.error('Error creating deletion log:', e);
-                }
+                    }, { transaction: t });
 
-                res.status(200).json({ message: 'Publicación eliminada' });
+                    await t.commit();
+                    console.log(`deletePost: commit successful for post ${postId}`);
+                    return res.status(200).json({ message: 'Publicación eliminada' });
+                } catch (e) {
+                    console.error('deletePost: error during transaction, rolling back:', e);
+                    try { await t.rollback(); } catch (rbErr) { console.error('Rollback failed:', rbErr); }
+                    return res.status(500).json({ message: 'Error al eliminar la publicación', error: e.message });
+                }
     } catch (error) {
         res.status(500).json({ message: "Error interno del servidor"});
         console.log(error)
